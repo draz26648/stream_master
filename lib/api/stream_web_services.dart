@@ -13,6 +13,11 @@ class Controller {
   dynamic apiurl = "https://stream.alkmal.com/api";
   bool isLoading = false;
 
+
+
+
+
+//register web service
   Future<dynamic> Register(
       {name,
       email,
@@ -23,16 +28,11 @@ class Controller {
       gender,
       birthdate}) async {
     var mydata = {
-      "name": '$name',
-      "image": '$email',
-      "voice": '$password',
-      "mobile": '$mobile',
       "email": '$email',
-      "interests": '$interests',
-      "gender": '$gender',
-      "birthdate": '$birthdate',
+      "mobile": '$mobile',
       "password": '$password',
-      "password_confirmation": '$confirmPassword'
+      "password_confirmation": '$confirmPassword',
+      "name": '$name',
     };
     print(" fgd ${mydata}");
     var res = await http.post(Uri.parse("$apiurl/register"),
@@ -51,6 +51,8 @@ class Controller {
     }
   }
 
+
+// interests web service
   Future<dynamic> getCategories() async {
     var res = await http.get(
       Uri.parse("$apiurl/categories"),
@@ -69,6 +71,9 @@ class Controller {
       return data;
     }
   }
+
+
+//login web service
 
   Future<dynamic> Login({email, password}) async {
     var mydata = {
@@ -94,6 +99,9 @@ class Controller {
     }
   }
 
+
+
+//home videos web service
   Future<dynamic> getPost() async {
     
     var header;
@@ -125,6 +133,8 @@ class Controller {
     }
   }
 
+
+// comments web service
   Future<dynamic> getComment(postId) async {
     var res = await http.get(
       Uri.parse("$apiurl/comments?post_id=$postId"),
@@ -141,6 +151,8 @@ class Controller {
     }
   }
 
+
+// add comment web service
   Future<dynamic> addComment({post_id, description}) async {
     var mydata = {
       "post_id": '$post_id',
@@ -166,6 +178,8 @@ class Controller {
     }
   }
 
+  // add follow web service
+
   Future<dynamic> addFllow({user_id}) async {
     var mydata = {
       "user_id": '$user_id',
@@ -190,6 +204,8 @@ class Controller {
     }
   }
 
+
+// add like web service
   Future<dynamic> addLike({post_id}) async {
     var mydata = {
       "post_id": '$post_id',
@@ -215,6 +231,8 @@ class Controller {
       return data;
     }
   }
+
+  // add video web service
 
   Future<dynamic> addPost({title, description, path}) async {
     var mydata = {
@@ -243,6 +261,8 @@ class Controller {
     }
   }
 
+  // get profile info web service
+
   Future<dynamic> getProfile() async {
     print(" ffffg ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}");
     var res = await http.get(
@@ -262,6 +282,8 @@ class Controller {
       return data;
     }
   }
+
+  // edit profile web service
 
   Future<dynamic> editProfile(File image,
       {name, description, email, mobile, password}) async {
@@ -304,6 +326,8 @@ class Controller {
       print(e);
     }
   }
+
+  // upload video web service
 
   Future<dynamic> uploadVideo(
       {required File? postPath, title, description}) async {

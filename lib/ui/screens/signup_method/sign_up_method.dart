@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stream_master/ui/screens/out_bording_screen/birth_date.dart';
+import 'package:stream_master/ui/screens/signup_method/selected_method.dart';
 
 import '../../widgets/constants.dart';
 
@@ -12,6 +13,8 @@ class SignUpMethods extends StatefulWidget {
   @override
   _SignUpMethodsState createState() => _SignUpMethodsState();
 }
+
+SelectedMethod? _method;
 
 class _SignUpMethodsState extends State<SignUpMethods> {
   @override
@@ -66,6 +69,7 @@ class _SignUpMethodsState extends State<SignUpMethods> {
                 children: [
                   GestureDetector(
                     onTap: () {
+                      _method = SelectedMethod(method: 'phone');
                       Navigator.pushNamed(context, '/birth_date');
                     },
                     child: Container(
@@ -115,6 +119,7 @@ class _SignUpMethodsState extends State<SignUpMethods> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      _method = SelectedMethod(method: 'email');
                       Navigator.pushNamed(context, '/birth_date');
                     },
                     child: Container(
@@ -162,6 +167,7 @@ class _SignUpMethodsState extends State<SignUpMethods> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      _method = SelectedMethod(method: 'google');
                       Navigator.pushNamed(context, '/birth_date');
                     },
                     child: Container(

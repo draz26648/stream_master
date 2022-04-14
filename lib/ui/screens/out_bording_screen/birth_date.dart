@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../get/general_controller.dart';
 import '../../widgets/constants.dart';
+import '../signup_method/selected_method.dart';
 
 class birthDate extends StatefulWidget {
   const birthDate({Key? key}) : super(key: key);
@@ -14,7 +16,7 @@ class birthDate extends StatefulWidget {
 
 class _birthDateState extends State<birthDate> {
   DateTime date = DateTime(2022, 03, 26);
-
+  SelectedMethod? _method;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +96,6 @@ class _birthDateState extends State<birthDate> {
                   GestureDetector(
                     onTap: () async {
                       DateTime? newDate = await showDatePicker(
-                        
                         context: context,
                         initialDate: DateTime.now(),
                         firstDate: DateTime(1900),
@@ -138,7 +139,13 @@ class _birthDateState extends State<birthDate> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/email_signUp');
+                        if (_method!.method == 'phone') {
+                          Navigator.pushNamed(context, '/phone_signUp');
+                        } else if (_method!.method == 'email') {
+                          Navigator.pushNamed(context, '/email_signUp');
+                        } else {
+                          Fluttertoast.showToast(msg: 'comming soon');
+                        }
                       },
                       child: Text(
                         'Confirm',

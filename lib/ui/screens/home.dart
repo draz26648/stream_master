@@ -29,9 +29,9 @@ class _HomePageState extends State<HomePage> {
 
   bool isloading = false;
 
-  GeneralDataController _controller = GeneralDataController.to;
+  final GeneralDataController _controller = GeneralDataController.to;
 
-  VideoController _videoController = VideoController();
+  final VideoController _videoController = VideoController();
 
   getPost() async {
     setState(() {
@@ -48,13 +48,15 @@ class _HomePageState extends State<HomePage> {
                   data = value;
 
                   data.forEach((element) {
+                    // ignore: invalid_use_of_protected_member
                     _controller.postData.value.add(Data.fromJson(element));
                   });
                 }),
 
                 print(
+                    // ignore: invalid_use_of_protected_member
                     "the data is ${_controller.postData.value[0].toString()}"),
-                // // print("the data here is ${_tags[0].name}")
+                
               }
             else
               {
@@ -71,10 +73,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // data = _videoController.postData.value;
-    // data.forEach((v) {
-    //   _videoController.postData.value.add(Data.fromJson(v.toJson()));
-    // });
+    
     getPost();
     super.initState();
   }
@@ -159,12 +158,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Stream<dynamic> myStream() async* {
-  //     yield getPost().listen((event) {
-  //
-  //     });
-  // }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -186,6 +180,7 @@ class _HomePageState extends State<HomePage> {
                       return Stack(
                         children: [
                           VideoPlayerItem(
+                            // ignore: invalid_use_of_protected_member
                             videoUrl: _controller.postData.value[index].path!,
                           ),
                           Column(
@@ -208,6 +203,7 @@ class _HomePageState extends State<HomePage> {
                                           children: [
                                             Text(
                                               _controller
+                                                  // ignore: invalid_use_of_protected_member
                                                   .postData.value[index].title!,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
@@ -218,6 +214,7 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             SizedBox(height: 10.h),
                                             Text(
+                                              // ignore: invalid_use_of_protected_member
                                               _controller.postData.value[index]
                                                   .description!,
                                               style: TextStyle(
