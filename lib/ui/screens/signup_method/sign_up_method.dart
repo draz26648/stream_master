@@ -8,15 +8,16 @@ import 'package:stream_master/ui/screens/signup_method/selected_method.dart';
 import '../../widgets/constants.dart';
 
 class SignUpMethods extends StatefulWidget {
+  
   const SignUpMethods({Key? key}) : super(key: key);
 
   @override
   _SignUpMethodsState createState() => _SignUpMethodsState();
 }
 
-SelectedMethod? _method;
 
 class _SignUpMethodsState extends State<SignUpMethods> {
+  SelectedMethod? _method;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,8 +70,8 @@ class _SignUpMethodsState extends State<SignUpMethods> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      _method = SelectedMethod(method: 'phone');
-                      Navigator.pushNamed(context, '/birth_date');
+                      
+                      Navigator.pushNamed(context, '/phone_signUp');
                     },
                     child: Container(
                       width: 343.w,
@@ -119,7 +120,7 @@ class _SignUpMethodsState extends State<SignUpMethods> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      _method = SelectedMethod(method: 'email');
+                      
                       Navigator.pushNamed(context, '/birth_date');
                     },
                     child: Container(
@@ -167,7 +168,7 @@ class _SignUpMethodsState extends State<SignUpMethods> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      _method = SelectedMethod(method: 'google');
+                      
                       Navigator.pushNamed(context, '/birth_date');
                     },
                     child: Container(

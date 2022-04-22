@@ -21,12 +21,13 @@ pickImage(ImageSource source) async {
   return profilePhoto;
 }
 
-checkLogin(context,doTask){
-  if(SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin() != null && SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin()!){
+checkLogin(context, doTask) {
+  if (SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin() != null &&
+      SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin()!) {
     doTask();
     return true;
   } else {
-    Navigator.pushReplacementNamed(context, '/signUp_method');
+    Navigator.pushNamed(context, '/signUp_method');
     return false;
   }
 }
@@ -36,8 +37,7 @@ showLoaderDialog(BuildContext context) {
     content: new Row(
       children: [
         CircularProgressIndicator(),
-        Container(
-            margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
+        Container(margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
       ],
     ),
   );
@@ -50,7 +50,7 @@ showLoaderDialog(BuildContext context) {
   );
 }
 
-showAlertDialog(BuildContext context,String text) {
+showAlertDialog(BuildContext context, String text) {
   Widget continueButton = Center(
     child: TextButton(
         child: Text(
@@ -66,7 +66,9 @@ showAlertDialog(BuildContext context,String text) {
   AlertDialog alert = AlertDialog(
     backgroundColor: Color(0xffF2F2F2),
     content: Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(17.r),),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(17.r),
+      ),
       child: Text(
         text,
         textAlign: TextAlign.center,

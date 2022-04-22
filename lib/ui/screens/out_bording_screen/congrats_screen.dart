@@ -4,8 +4,6 @@ import 'package:stream_master/ui/screens/nav.dart';
 
 import '../../widgets/constants.dart';
 
-
-
 class CongratsScreen extends StatefulWidget {
   const CongratsScreen({Key? key}) : super(key: key);
 
@@ -26,7 +24,9 @@ class _CongratsScreenState extends State<CongratsScreen> {
             children: [
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 128.w),
-                child: Image.asset('assets/congrats.png',),
+                child: Image.asset(
+                  'assets/images/congrats.png',
+                ),
               ),
               Container(
                 margin: EdgeInsets.only(left: 16.w, top: 12.h, bottom: 2.h),
@@ -53,7 +53,6 @@ class _CongratsScreenState extends State<CongratsScreen> {
                 ),
               ),
               SizedBox(
-                
                 width: 343.w,
                 height: 48.h,
                 child: ElevatedButton(
@@ -66,11 +65,18 @@ class _CongratsScreenState extends State<CongratsScreen> {
                   ),
                   onPressed: () {
                     Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => NavScreen(),),);
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NavScreen(),
+                      ),
+                    );
                   },
                   child: Text(
                     'Start Watching',
-                    style: TextStyle(fontSize: 16.sp, fontFamily: 'poppins', color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 16.sp,
+                        fontFamily: 'poppins',
+                        color: Colors.white),
                   ),
                 ),
               ),

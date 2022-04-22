@@ -1,7 +1,6 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../api/stream_web_services.dart';
 import '../../../get/general_controller.dart';
@@ -19,10 +18,10 @@ class EmailSignUp extends StatefulWidget {
 class _EmailSignUpState extends State<EmailSignUp> {
   bool _isObscure = true;
 
-  late TextEditingController _nameTextEditingController;
-  late TextEditingController _emailTextEditingController;
-  late TextEditingController _passwordTextEditingController;
-  late TextEditingController _confirmPasswordTextEditingController;
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  late TextEditingController _confirmController;
   late GeneralDataController controller;
 
   var data;
@@ -31,19 +30,19 @@ class _EmailSignUpState extends State<EmailSignUp> {
   @override
   void initState() {
     super.initState();
-    _nameTextEditingController = TextEditingController();
-    _emailTextEditingController = TextEditingController();
-    _passwordTextEditingController = TextEditingController();
-    _confirmPasswordTextEditingController = TextEditingController();
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _confirmController = TextEditingController();
     controller = GeneralDataController.to;
   }
 
   @override
   void dispose() {
-    _nameTextEditingController.dispose();
-    _emailTextEditingController.dispose();
-    _passwordTextEditingController.dispose();
-    _confirmPasswordTextEditingController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmController.dispose();
     // controller.dispose();
     super.dispose();
   }
@@ -129,7 +128,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                         Container(
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
                           child: TextField(
-                            controller: _nameTextEditingController,
+                            controller: _nameController,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
                               contentPadding:
@@ -168,7 +167,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                         Container(
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
                           child: TextField(
-                            controller: _emailTextEditingController,
+                            controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
                               contentPadding:
@@ -207,7 +206,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
                           child: TextField(
                             obscureText: _isObscure,
-                            controller: _passwordTextEditingController,
+                            controller: _passwordController,
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               suffixIcon: IconButton(
@@ -215,6 +214,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                                   _isObscure
                                       ? Icons.visibility_off
                                       : Icons.visibility,
+                                  color: Colors.black,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -259,7 +259,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                               left: 16.w, right: 16.w, top: 10.h),
                           child: TextField(
                             obscureText: _isObscure,
-                            controller: _confirmPasswordTextEditingController,
+                            controller: _confirmController,
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               suffixIcon: IconButton(
@@ -267,6 +267,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                                   _isObscure
                                       ? Icons.visibility_off
                                       : Icons.visibility,
+                                  color: Colors.black,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -312,15 +313,13 @@ class _EmailSignUpState extends State<EmailSignUp> {
                               // setState(() {
                               //   isloading = true;
                               // });
-                              var name = _nameTextEditingController.text;
-                              var email = _emailTextEditingController.text;
-                              var password =
-                                  _passwordTextEditingController.text;
-                              var confirm =
-                                  _confirmPasswordTextEditingController.text;
+                              var name = _nameController.text;
+                              var email = _emailController.text;
+                              var password = _passwordController.text;
+                              var confirm = _confirmController.text;
 
                               Controller()
-                                  .Register(
+                                  .register(
                                       name: name,
                                       email: email,
                                       password: password,
@@ -330,31 +329,20 @@ class _EmailSignUpState extends State<EmailSignUp> {
                                       gender: controller.gender,
                                       birthdate: controller.date)
                                   .then((value) {
-                                print("ddd ${value}");
+                                print("Register ${value}");
 
-                                if (!value.containsKey("token")) {
+                                if (value['status'] != true) {
                                   Navigator.of(context, rootNavigator: true)
                                       .pop();
+
                                   showAlertDialog(context, value['message']);
-                                  
                                 } else {
-                                  SharedPrefrencesHelper.sharedPrefrencesHelper
-                                      .setIsLogin(true);
-                                  SharedPrefrencesHelper.sharedPrefrencesHelper
-                                      .setToken(value['token']);
+                                  Fluttertoast.showToast(msg: value['message']);
                                   Navigator.pushReplacementNamed(
-                                      context, '/congrats_screen');
+                                      context, '/Sign_in');
                                   Navigator.of(context, rootNavigator: true)
                                       .pop();
                                 }
-
-                                // setState(() {
-                                //   // isloading = false;
-                                //   // Navigator.pop(context);
-                                //
-                                //   // Navigator.pushReplacementNamed(
-                                //   //     context, '/congrats_screen');
-                                // });
                               });
 
                               // Navigator.pushReplacementNamed(context, '/congrats_screen');

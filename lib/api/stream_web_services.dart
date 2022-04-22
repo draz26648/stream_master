@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
+import 'package:stream_master/models/login_model.dart';
 
 import '../helper/shared_prefrences_helper.dart';
 
@@ -13,12 +12,8 @@ class Controller {
   dynamic apiurl = "https://stream.alkmal.com/api";
   bool isLoading = false;
 
-
-
-
-
 //register web service
-  Future<dynamic> Register(
+  Future<dynamic> register(
       {name,
       email,
       mobile,
@@ -40,7 +35,7 @@ class Controller {
           'Context-Type': 'application/json;charSet=UTF-8'
         },
         body: mydata);
-    print("ggggggggggggg ${res.body}");
+    print(" ${res.body}");
 
     final data = await json.decode(res.body);
     if (res.statusCode == 200) {
@@ -50,7 +45,6 @@ class Controller {
       return data;
     }
   }
-
 
 // interests web service
   Future<dynamic> getCategories() async {
@@ -72,26 +66,27 @@ class Controller {
     }
   }
 
-
 //login web service
 
   Future<dynamic> Login({email, password}) async {
     var mydata = {
-      "email": '$email',
+      "username": '$email',
       "password": '$password',
     };
 
-    print(mydata);
-
+    print('you input $mydata');
+    LoginModel loginmodel = LoginModel();
     var res = await http.post(Uri.parse("$apiurl/login"),
         headers: <String, String>{
           'Context-Type': 'application/json;charSet=UTF-8'
         },
         body: mydata);
-    print("ggggggggggggg ${res.body}");
+
+    // print(" ${res.body}");
 
     final data = await json.decode(res.body);
-    if (res.statusCode == 200) {
+    loginmodel = LoginModel.fromJson(json.decode(res.body));
+    if (res.statusCode == 402) {
       print(data);
       return data;
     } else {
@@ -99,11 +94,8 @@ class Controller {
     }
   }
 
-
-
 //home videos web service
   Future<dynamic> getPost() async {
-    
     var header;
     if (SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin()!) {
       print(
@@ -133,7 +125,6 @@ class Controller {
     }
   }
 
-
 // comments web service
   Future<dynamic> getComment(postId) async {
     var res = await http.get(
@@ -150,7 +141,6 @@ class Controller {
       return data;
     }
   }
-
 
 // add comment web service
   Future<dynamic> addComment({post_id, description}) async {
@@ -203,7 +193,6 @@ class Controller {
       return data;
     }
   }
-
 
 // add like web service
   Future<dynamic> addLike({post_id}) async {
@@ -371,8 +360,8 @@ class Controller {
       } else {
         return data;
       }
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      return responseData;
+      // final Map<String, dynamic> responseData = json.decode(response.body);
+      // return responseData;
     } catch (e) {
       print(e);
     }

@@ -139,13 +139,9 @@ class _birthDateState extends State<birthDate> {
                         ),
                       ),
                       onPressed: () {
-                        if (_method!.method == 'phone') {
-                          Navigator.pushNamed(context, '/phone_signUp');
-                        } else if (_method!.method == 'email') {
+                       
                           Navigator.pushNamed(context, '/email_signUp');
-                        } else {
-                          Fluttertoast.showToast(msg: 'comming soon');
-                        }
+                       
                       },
                       child: Text(
                         'Confirm',

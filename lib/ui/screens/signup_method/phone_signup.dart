@@ -1,10 +1,8 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../widgets/constants.dart';
-
 
 class PhoneSignUp extends StatefulWidget {
   const PhoneSignUp({Key? key}) : super(key: key);
@@ -57,7 +55,8 @@ class _PhoneSignUpState extends State<PhoneSignUp> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 24.h, left: 16.w, right: 122.w),
+                    margin:
+                        EdgeInsets.only(top: 24.h, left: 16.w, right: 122.w),
                     child: Text(
                       'Enter your email address and we will send you a confirm code',
                       style: TextStyle(
@@ -69,7 +68,8 @@ class _PhoneSignUpState extends State<PhoneSignUp> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 24.h, left: 16.w,  bottom: 10.h),
+                    margin:
+                        EdgeInsets.only(top: 24.h, left: 16.w, bottom: 10.h),
                     child: Text(
                       'Full Name',
                       style: TextStyle(
@@ -101,7 +101,7 @@ class _PhoneSignUpState extends State<PhoneSignUp> {
                   Container(
                     margin: EdgeInsets.only(top: 10.h, left: 16.w),
                     child: Text(
-                      'Email Address',
+                      'Phone Number',
                       style: TextStyle(
                         color: color2,
                         fontFamily: 'poppins',
@@ -113,7 +113,7 @@ class _PhoneSignUpState extends State<PhoneSignUp> {
                   Container(
                     margin: EdgeInsets.only(left: 16.w, right: 16.w, top: 10.h),
                     child: TextField(
-                      keyboardType: TextInputType.emailAddress,
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                         hintStyle: TextStyle(fontFamily: 'Poppins'),
@@ -129,19 +129,21 @@ class _PhoneSignUpState extends State<PhoneSignUp> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+                    margin:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
                     width: 343.w,
                     height: 48.h,
                     child: ElevatedButton(
                       style: TextButton.styleFrom(
                         minimumSize: Size(0, 126.h),
-                        backgroundColor:const  Color(0xff242424),
+                        backgroundColor: const Color(0xff242424),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0.r),
                         ),
                       ),
                       onPressed: () {
-                        // Navigator.pushReplacementNamed(context, '/go_watching');
+                        Navigator.pushReplacementNamed(
+                            context, '/congrats_screen');
                       },
                       child: Text(
                         'Sign up',

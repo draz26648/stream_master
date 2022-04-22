@@ -2,13 +2,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:stream_master/models/login_model.dart';
 
 import '../../../api/stream_web_services.dart';
 import '../../../helper/shared_prefrences_helper.dart';
 import '../../../utils.dart';
 import '../../widgets/constants.dart';
-
 
 class EmailSignIn extends StatefulWidget {
   const EmailSignIn({Key? key}) : super(key: key);
@@ -18,26 +17,26 @@ class EmailSignIn extends StatefulWidget {
 }
 
 class _EmailSignInState extends State<EmailSignIn> {
-
   bool _isObscure = true;
 
-  late TextEditingController _emailTextEditingController;
-  late TextEditingController _passwordTextEditingController;
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  LoginModel model = LoginModel();
 
   var data;
   var isloading = false;
 
   @override
   void initState() {
-    _emailTextEditingController = TextEditingController();
-    _passwordTextEditingController = TextEditingController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _emailTextEditingController.dispose();
-    _passwordTextEditingController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -122,7 +121,7 @@ class _EmailSignInState extends State<EmailSignIn> {
                         Container(
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
                           child: TextField(
-                            controller: _emailTextEditingController,
+                            controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
                               contentPadding:
@@ -161,12 +160,14 @@ class _EmailSignInState extends State<EmailSignIn> {
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
                           child: TextField(
                             obscureText: _isObscure,
-                            controller: _passwordTextEditingController,
+                            controller: _passwordController,
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _isObscure ? Icons.visibility : Icons.visibility_off,
+                                  _isObscure
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -209,29 +210,28 @@ class _EmailSignInState extends State<EmailSignIn> {
                             ),
                             onPressed: () {
                               showLoaderDialog(context);
-                              var email = _emailTextEditingController.text;
-                              var password =
-                                  _passwordTextEditingController.text;
+                              var email = _emailController.text;
+                              var password = _passwordController.text;
                               // print(email+password);
                               Controller()
                                   .Login(email: email, password: password)
                                   .then((value) {
-                                if (!value.containsKey("token")) {
-                                  Navigator.of(context, rootNavigator: true).pop();
+                                if (value['status'] != true) {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
 
-                                  showAlertDialog(context,value['message']);
-                                  // var snackBar = SnackBar(content: Text(value['message']),);
-                                  // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                  showAlertDialog(context, value.message!);
                                 } else {
-                                  SharedPrefrencesHelper.sharedPrefrencesHelper.setIsLogin(true);
-                                  SharedPrefrencesHelper.sharedPrefrencesHelper.setToken(value['token']);
-                                  Navigator.pushReplacementNamed(context, '/congrats_screen');
-                                  Navigator.of(context, rootNavigator: true).pop();
+                                  SharedPrefrencesHelper.sharedPrefrencesHelper
+                                      .setIsLogin(true);
+                                  SharedPrefrencesHelper.sharedPrefrencesHelper
+                                      .setToken(value['data']['token']);
+                                  Navigator.pushReplacementNamed(
+                                      context, '/congrats_screen');
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
                                 }
-
-                      
                               });
-                             
                             },
                             child: Text(
                               'Login',
@@ -245,7 +245,8 @@ class _EmailSignInState extends State<EmailSignIn> {
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.symmetric(horizontal: 90.w, vertical: 14.h),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: 90.w, vertical: 14.h),
                           child: Row(
                             children: [
                               RichText(
@@ -261,7 +262,10 @@ class _EmailSignInState extends State<EmailSignIn> {
                                   children: [
                                     const TextSpan(text: ' '),
                                     TextSpan(
-                                      recognizer: TapGestureRecognizer()..onTap = () => Navigator.pushReplacementNamed(context, '/signUp_method'),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () =>
+                                            Navigator.pushReplacementNamed(
+                                                context, '/signUp_method'),
                                       text: 'SignUp',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w500,
