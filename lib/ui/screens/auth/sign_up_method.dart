@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:stream_master/ui/screens/auth/selected_method.dart';
 
 import '../../widgets/constants.dart';
@@ -31,16 +32,18 @@ class _SignUpMethodsState extends State<SignUpMethods> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  margin: EdgeInsets.only(left: 16.w, top: 148.h),
-                  child: Text(
-                    'Let’s get started',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'poppins',
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.w500),
+                  margin: EdgeInsets.only(top: 50.h, left: 19),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.keyboard_backspace,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
+
                 Container(
                   margin: EdgeInsets.only(left: 16.w),
                   child: Text(
@@ -116,7 +119,7 @@ class _SignUpMethodsState extends State<SignUpMethods> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/birth_date');
+                      Navigator.pushNamed(context, '/email_signUp');
                     },
                     child: Container(
                       width: 343.w,
@@ -163,7 +166,7 @@ class _SignUpMethodsState extends State<SignUpMethods> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/birth_date');
+                      Fluttertoast.showToast(msg: 'Coming soon');
                     },
                     child: Container(
                       width: 343.w,

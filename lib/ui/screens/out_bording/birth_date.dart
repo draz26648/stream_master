@@ -138,7 +138,7 @@ class _birthDateState extends State<birthDate> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/email_signUp');
+                        Navigator.pushNamed(context, '/signUp_method');
                       },
                       child: Text(
                         'Confirm',

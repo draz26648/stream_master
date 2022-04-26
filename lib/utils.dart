@@ -27,7 +27,7 @@ checkLogin(context, doTask) {
     doTask();
     return true;
   } else {
-    Navigator.pushNamed(context, '/signUp_method');
+    Navigator.pushNamed(context, '/Sign_in');
     return false;
   }
 }

@@ -265,7 +265,7 @@ class _EmailSignInState extends State<EmailSignIn> {
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () =>
                                             Navigator.pushReplacementNamed(
-                                                context, '/signUp_method'),
+                                                context, '/birth_date'),
                                       text: 'SignUp',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w500,
