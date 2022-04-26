@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../../helper/shared_prefrences_helper.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -28,6 +31,7 @@ class _EditProfileScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 32),
             InkWell(
               child: Row(
                 children: [
@@ -81,8 +85,7 @@ class _EditProfileScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-                  IconButton(
-                      onPressed: () {}, icon: Icon(Icons.arrow_forward_ios)),
+                  const Icon(Icons.arrow_forward_ios),
                   const SizedBox(width: 10),
                 ],
               ),
@@ -110,8 +113,7 @@ class _EditProfileScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-                  IconButton(
-                      onPressed: () {}, icon: Icon(Icons.arrow_forward_ios)),
+                  const Icon(Icons.arrow_forward_ios),
                   const SizedBox(width: 10),
                 ],
               ),
@@ -142,13 +144,16 @@ class _EditProfileScreenState extends State<SettingsScreen> {
                   Container(
                     width: 36.w,
                     height: 20.h,
-                    color: Color(0xFF7A87FF),
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text(
+                    decoration: BoxDecoration(
+                      color: Color(0xFF7A87FF),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: const Center(
+                      child: Text(
                         'عربى',
                         style: TextStyle(
                           fontSize: 12,
+                          color: Colors.white,
                           fontFamily: 'Poppins',
                           fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.w400,
@@ -162,27 +167,36 @@ class _EditProfileScreenState extends State<SettingsScreen> {
               onTap: () {},
             ),
             const SizedBox(height: 32),
-            Row(
-              children: [
-                Image.asset(
-                  'assets/images/logout.png',
-                  width: 24.w,
-                  height: 24.h,
-                ),
-                const SizedBox(width: 15),
-                const Expanded(
-                  child: Text(
-                    'Logout',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      fontStyle: FontStyle.normal,
-                      fontWeight: FontWeight.w500,
+            InkWell(
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/images/logout.png',
+                    width: 24.w,
+                    height: 24.h,
+                  ),
+                  const SizedBox(width: 15),
+                  const Expanded(
+                    child: Text(
+                      'Logout',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-              ],
+                  const SizedBox(width: 10),
+                ],
+              ),
+              onTap: () {
+                SharedPrefrencesHelper.sharedPrefrencesHelper.setIsLogin(false);
+                SharedPrefrencesHelper.sharedPrefrencesHelper.logout(
+                    '${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}');
+                Fluttertoast.showToast(msg: 'Logged out');
+                Navigator.pushReplacementNamed(context, '/Sign_in');
+              },
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:stream_master/models/comments_model.dart';
 
 import '../../api/stream_web_services.dart';
 import '../../models/login_model.dart';
@@ -19,15 +20,19 @@ class CommentScreen extends StatefulWidget {
 }
 
 class _CommentScreenState extends State<CommentScreen> {
-  late var data = [];
+  late List<Data2> fetchedComments = [];
 
   bool isloading = false;
-
+  String? profilePic;
   getComment() async {
     setState(() {
       isloading = true;
     });
     try {
+      Controller()
+          .getProfile()
+          .then((value) => profilePic = value['data']['avatar']);
+
       Controller().getComment(widget.postId).then((value) => {
             setState(() {
               isloading = false;
@@ -35,14 +40,10 @@ class _CommentScreenState extends State<CommentScreen> {
             if (value != null)
               {
                 setState(() {
-                  data = value['data']['data'];
-
-                  // value.forEach((v) {
-                  //   _tags.add(Cat.fromJson(v));
-                  // });
+                  value.forEach((element) {
+                    fetchedComments.add(Data2.fromJson(element));
+                  });
                 }),
-                print("the data is ${value['data']}"),
-                // print("the data here is ${_tags[0].name}")
               }
             else
               {}
@@ -65,7 +66,6 @@ class _CommentScreenState extends State<CommentScreen> {
   @override
   Widget build(BuildContext context) {
     TextEditingController _commentController = TextEditingController();
-    LoginModel login = LoginModel();
 
     return isloading
         ? const Center(
@@ -93,9 +93,9 @@ class _CommentScreenState extends State<CommentScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Comment   ${widget.commentCount}',
+                          'Comments ${widget.commentCount}',
                           style: TextStyle(
-                            color: Colors.grey.shade400,
+                            color: Colors.white,
                             fontFamily: 'poppins',
                             fontSize: 17.sp,
                           ),
@@ -113,19 +113,19 @@ class _CommentScreenState extends State<CommentScreen> {
                     color: Color(0xff232324),
                     height: 380.h,
                     child: ListView.builder(
-                      itemCount: data.length,
+                      itemCount: fetchedComments.length,
                       itemBuilder: ((context, index) {
                         return ListTile(
                           leading: CircleAvatar(
                             radius: 19.r,
-                            backgroundImage:
-                                NetworkImage(data[index]['user']['avatar']),
+                            backgroundImage: NetworkImage(
+                                fetchedComments[index].user!.avatar!),
                           ),
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                data[index]['user']['name'],
+                                fetchedComments[index].user!.name!,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w400,
@@ -137,7 +137,7 @@ class _CommentScreenState extends State<CommentScreen> {
                                 height: 3.h,
                               ),
                               Text(
-                                data[index]['description'],
+                                fetchedComments[index].description!,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500,
@@ -152,7 +152,9 @@ class _CommentScreenState extends State<CommentScreen> {
                               Text(
                                 DateFormat.MMMMEEEEd()
                                     .format(DateTime.parse(
-                                        data[index]['created_at']))
+                                        fetchedComments[index]
+                                            .createdAt!
+                                            .toString()))
                                     .toString(),
                                 style: TextStyle(
                                   fontSize: 12.5.sp,
@@ -195,8 +197,7 @@ class _CommentScreenState extends State<CommentScreen> {
                       children: [
                         CircleAvatar(
                           radius: 20.r,
-                          backgroundImage:
-                              const AssetImage('assets/images/commentpic.png'),
+                          backgroundImage: NetworkImage(profilePic!),
                         ),
                         SizedBox(
                           width: 10.w,
@@ -234,7 +235,6 @@ class _CommentScreenState extends State<CommentScreen> {
                           onPressed: () {
                             if (_commentController.text.isNotEmpty) {
                               checkLogin(context, () {
-                                // showLoaderDialog(context);
                                 Controller().addComment(
                                     post_id: widget.postId,
                                     description: _commentController.text);

@@ -1,18 +1,21 @@
-
+import 'dart:core';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefrencesHelper {
   SharedPrefrencesHelper._();
 
-  SharedPreferences? sharedPrefrences ;
+  SharedPreferences? sharedPrefrences;
 
   static SharedPrefrencesHelper sharedPrefrencesHelper =
       SharedPrefrencesHelper._();
 
-
   initSharedPrefrences() async {
     sharedPrefrences = await SharedPreferences.getInstance();
+  }
+
+  logout(String token) async {
+    await sharedPrefrences!.remove(token);
   }
 
   setToken(String token) async {
@@ -55,7 +58,7 @@ class SharedPrefrencesHelper {
     return sharedPrefrences!.getBool('isLogin');
   }
 
-  setSeen(String key,bool isLogin) async {
+  setSeen(String key, bool isLogin) async {
     await sharedPrefrences!.setBool(key, isLogin);
   }
 
@@ -63,17 +66,15 @@ class SharedPrefrencesHelper {
     return sharedPrefrences!.getBool(key);
   }
 
-  setData(key,value)async{
+  setData(key, value) async {
     await sharedPrefrences!.setString(key, value);
   }
 
-  String? getData(key){
+  String? getData(key) {
     return sharedPrefrences!.getString(key);
   }
 
-  clear(){
+  clear() {
     return sharedPrefrences!.clear();
   }
-
-
 }

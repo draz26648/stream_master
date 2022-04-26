@@ -21,7 +21,7 @@ class ProgressHUD extends StatefulWidget {
 
   @override
   _ProgressHUDState createState() {
-    state = new _ProgressHUDState();
+    state = _ProgressHUDState();
 
     return state!;
   }
@@ -52,27 +52,27 @@ class _ProgressHUDState extends State<ProgressHUD> {
   @override
   Widget build(BuildContext context) {
     if (_visible) {
-      return new Scaffold(
+      return Scaffold(
           backgroundColor: widget.backgroundColor,
-          body: new Stack(
+          body: Stack(
             children: <Widget>[
-              new Center(
-                child: new Container(
+              Center(
+                child: Container(
                   width: 100.0,
                   height: 100.0,
-                  decoration: new BoxDecoration(
+                  decoration: BoxDecoration(
                       color: widget.containerColor,
-                      borderRadius: new BorderRadius.all(
-                          new Radius.circular(widget.borderRadius))),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(widget.borderRadius))),
                 ),
               ),
-              new Center(
+              Center(
                 child: _getCenterContent(),
               )
             ],
           ));
     } else {
-      return new Container();
+      return Container();
     }
   }
 
@@ -81,16 +81,16 @@ class _ProgressHUDState extends State<ProgressHUD> {
       return _getCircularProgress();
     }
 
-    return new Center(
-      child: new Column(
+    return Center(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _getCircularProgress(),
-          new Container(
+          Container(
             margin: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
-            child: new Text(
+            child: Text(
               widget.text,
-              style: new TextStyle(color: widget.color),
+              style: TextStyle(color: widget.color),
             ),
           )
         ],
@@ -99,7 +99,7 @@ class _ProgressHUDState extends State<ProgressHUD> {
   }
 
   Widget _getCircularProgress() {
-    return new CircularProgressIndicator(
-        valueColor: new AlwaysStoppedAnimation(widget.color));
+    return CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(widget.color));
   }
 }

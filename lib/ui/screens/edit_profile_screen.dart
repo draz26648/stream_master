@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../api/stream_web_services.dart';
-import '../../get/profile_controller.dart';
+import '../../controllers/profile_controller.dart';
 import '../../utils.dart';
 import '../widgets/constants.dart';
 

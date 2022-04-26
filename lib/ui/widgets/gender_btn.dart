@@ -2,18 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stream_master/ui/widgets/constants.dart';
 
-import '../../get/general_controller.dart';
+import '../../controllers/general_controller.dart';
 import '../../helper/shared_prefrences_helper.dart';
 
-
-
 class GenderBtn extends StatelessWidget {
-
   IconData? icon;
   int? value;
   int? groupValue;
   ValueChanged? onChanged;
-
 
   GenderBtn({this.icon, this.value, this.groupValue, this.onChanged});
 
@@ -34,13 +30,18 @@ class GenderBtn extends StatelessWidget {
         ),
         onPressed: () {
           GeneralDataController.to.gender.value = value!;
-          SharedPrefrencesHelper.sharedPrefrencesHelper.setData("gender",value.toString());
+          SharedPrefrencesHelper.sharedPrefrencesHelper
+              .setData("gender", value.toString());
           onChanged!(value);
         },
         child: Icon(
           icon,
           size: 55,
-          color: !isSelected ? color1 : icon == Icons.female ? Colors.pink:Colors.blue[500],
+          color: !isSelected
+              ? color1
+              : icon == Icons.female
+                  ? Colors.pink
+                  : Colors.blue[500],
         ),
       ),
     );

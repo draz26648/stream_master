@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,10 +5,7 @@ import 'package:stream_master/ui/screens/add_video.dart';
 import 'package:stream_master/ui/screens/discoverPage.dart';
 import 'package:stream_master/ui/screens/home.dart';
 import 'package:stream_master/ui/screens/profile_screen.dart';
-
-
-
-
+import 'package:stream_master/ui/screens/shoot_screen.dart';
 
 class NavScreen extends StatefulWidget {
   const NavScreen({Key? key}) : super(key: key);
@@ -28,14 +23,17 @@ class _NavScreenState extends State<NavScreen> {
     });
   }
 
-  List pages =  [
-    HomePage(
+  List pages = [
+    const HomePage(
       key: PageStorageKey('homepage'),
     ),
-    DiscoverPage(),
+    const DiscoverPage(),
     CreatVideo(),
-    Scaffold(),
-    ProfilePage(isSelfPage: true,),
+    // ShootPage(),
+    const Scaffold(),
+    const ProfilePage(
+      isSelfPage: true,
+    ),
   ];
 
   @override
@@ -49,28 +47,36 @@ class _NavScreenState extends State<NavScreen> {
         currentIndex: currentIndex,
         onTap: onTap,
         items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled,size: 30,),
-            // icon: Image.asset('assets/home.png'),
+          const BottomNavigationBarItem(
+            icon: ImageIcon(
+              AssetImage('assets/images/home-2.png'),
+              size: 24,
+            ),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search,size: 30,),
-            // icon: Image.asset('assets/search.png'),
+          const BottomNavigationBarItem(
+            icon: ImageIcon(
+              AssetImage('assets/images/search.png'),
+              size: 24,
+            ),
             label: 'Discover',
           ),
           BottomNavigationBarItem(
             icon: Image.asset('assets/images/live.png'),
             label: '',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_outlined,size: 25,),
-            // icon: Image.asset('assets/chat.png'),
+          const BottomNavigationBarItem(
+            icon: ImageIcon(
+              AssetImage('assets/images/chat.png'),
+              size: 24,
+            ),
             label: 'Chat',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline,size: 30,),
-            // icon: Image.asset('assets/profile.png'),
+          const BottomNavigationBarItem(
+            icon: ImageIcon(
+              AssetImage('assets/images/profile.png'),
+              size: 24,
+            ),
             label: 'Me',
           ),
         ],

@@ -233,6 +233,9 @@ class User {
     this.smsNotification,
     this.description,
     this.isFollow,
+    this.username,
+    this.verifyCode,
+    this.fcmToken,
   });
 
   int? id;
@@ -245,6 +248,9 @@ class User {
   String? smsNotification;
   Description? description;
   bool? isFollow;
+  String? username;
+  String? verifyCode;
+  String? fcmToken;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
         id: json["id"],
@@ -259,6 +265,9 @@ class User {
             ? null
             : descriptionValues.map![json["description"]],
         isFollow: json["is_follow"],
+        username: json["username"],
+        verifyCode: json["verify_code"],
+        fcmToken: json["fcm_token"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -273,6 +282,9 @@ class User {
         "description":
             description == null ? null : descriptionValues.reverse[description],
         "is_follow": isFollow,
+        "username": username,
+        "verify_code": verifyCode,
+        "fcm_token": fcmToken,
       };
 }
 

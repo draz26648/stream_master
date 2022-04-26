@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
+import 'package:stream_master/models/comments_model.dart';
 import 'package:stream_master/models/login_model.dart';
 
 import '../helper/shared_prefrences_helper.dart';
@@ -85,9 +86,10 @@ class Controller {
     // print(" ${res.body}");
 
     final data = await json.decode(res.body);
-    loginmodel = LoginModel.fromJson(json.decode(res.body));
-    if (res.statusCode == 402) {
-      print(data);
+    loginmodel = LoginModel.fromJson(data);
+    if (res.statusCode == 200) {
+      print('login model data is $loginmodel');
+      print('fetched data is $data');
       return data;
     } else {
       return data;
@@ -133,7 +135,8 @@ class Controller {
         'Context-Type': 'application/json;charSet=UTF-8'
       },
     );
-    final data = await json.decode(res.body);
+    final Map<String, dynamic> map = await json.decode(res.body);
+    final List<dynamic> data = map['data']['data'];
     if (res.statusCode == 200) {
       print(data);
       return data;
@@ -157,7 +160,7 @@ class Controller {
           'Accept': 'application/json'
         },
         body: mydata);
-    print("ggggggggggggg ${res}");
+    print(" ${res}");
 
     final data = await json.decode(res.body);
     if (res.statusCode == 200) {
@@ -183,7 +186,7 @@ class Controller {
           'Accept': 'application/json'
         },
         body: mydata);
-    print("ggggggggggggg ${res.body}");
+    print(" ${res.body}");
 
     final data = await json.decode(res.body);
     if (res.statusCode == 200) {
@@ -208,7 +211,7 @@ class Controller {
           'Accept': 'application/json'
         },
         body: mydata);
-    print("ggggggggggggg ${res}");
+    print(" ${res}");
     final data = await json.decode(res.body);
     if (res.statusCode == 200) {
       // final data = await json.decode(res.body);
@@ -238,7 +241,7 @@ class Controller {
           'Accept': 'application/json'
         },
         body: mydata);
-    print("ggggggggggggg ${res}");
+    print(" ${res}");
 
     final data = await json.decode(res.body);
 

@@ -1,17 +1,14 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:stream_master/ui/screens/settings_screen.dart';
 import 'package:video_player/video_player.dart';
-import 'dart:convert' as convert;
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../api/stream_web_services.dart';
-import '../../get/profile_controller.dart';
+import '../../controllers/profile_controller.dart';
+
 import '../../models/profile.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -33,8 +30,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // late UserModel model;
+  // int? userId;
+  //
+  // late List<Data> fetchProfile = [];
   var data;
+
   late VideoPlayerController _controller;
 
   var isloading = false;
@@ -52,12 +52,8 @@ class _ProfilePageState extends State<ProfilePage> {
               {
                 setState(() {
                   data = value['data'];
-                  // return data;
-                  // value.forEach((v) {
-                  //   _tags.add(Post.fromJson(v));
-                  // });
                 }),
-                ProfileController.to.data.value = Profile.fromJson(data),
+                ProfileController.to.data.value = Data.fromJson(data),
                 print("the data is ${data}"),
               }
             else
@@ -81,19 +77,9 @@ class _ProfilePageState extends State<ProfilePage> {
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
 
-    // _controller.addListener(() {
-    //   setState(() {});
-    // });
     _controller.setLooping(true);
     _controller.initialize();
   }
-
-  // @override
-  // void didChangeDependencies() {
-  //   print("did called");
-  //   // data = loadJson();
-  //   super.didChangeDependencies();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: CircularProgressIndicator(),
                 )
               : Obx(() {
-                  print("${ProfileController.to.data.value}");
+                  // print("${ProfileController.to.data.value}");
                   return Column(
                     children: [
                       Expanded(
@@ -129,7 +115,6 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 Container(
                                   child: Row(
-                                    // mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
                                         child: ClipRRect(
@@ -159,27 +144,26 @@ class _ProfilePageState extends State<ProfilePage> {
                                       SizedBox(
                                         width: 16.w,
                                       ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            data['name'],
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                          SizedBox(
-                                            height: 7.h,
-                                          ),
-                                          Text(
-                                            '@${data['name']}',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        width: 110.w,
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              data['name'],
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            SizedBox(
+                                              height: 7.h,
+                                            ),
+                                            Text(
+                                              '@${data['name']}',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                       IconButton(
                                         onPressed: () {
@@ -199,7 +183,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                                       SettingsScreen()));
                                         },
                                         icon: Image.asset(
-                                            'assets/images/setting.png'),
+                                          'assets/images/setting.png',
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -220,7 +205,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                             Text(
                                               ProfileController
                                                   .to.data.value.postsCount!,
-                                              // data['posts_count'],
                                               style: TextStyle(
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.w500,
@@ -242,8 +226,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                         onTap: () {},
                                       ),
                                       Container(
-                                        color: Colors.black54,
-                                        width: 1,
+                                        color: Colors.white,
+                                        width: 1.5,
                                         height: 15,
                                         margin: EdgeInsets.symmetric(
                                             horizontal: 15.w),
@@ -252,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           child: Column(
                                             children: [
                                               Text(
-                                                '500',
+                                                data['followings_count'],
                                                 style: TextStyle(
                                                     fontSize: 14.sp,
                                                     fontWeight: FontWeight.w500,
@@ -272,8 +256,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                           onTap: () {}),
                                       Container(
-                                        color: Colors.black54,
-                                        width: 1,
+                                        color: Colors.white,
+                                        width: 1.5,
                                         height: 15,
                                         margin: EdgeInsets.symmetric(
                                             horizontal: 15),
@@ -281,7 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Column(
                                         children: [
                                           Text(
-                                            '1500',
+                                            data['followers_count'],
                                             style: TextStyle(
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.w500,
@@ -291,7 +275,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             height: 5,
                                           ),
                                           Text(
-                                            "Followes",
+                                            "Followers",
                                             style: TextStyle(
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.w500,
@@ -359,15 +343,16 @@ class _ProfilePageState extends State<ProfilePage> {
                               unselectedLabelColor: Colors.grey,
                               tabs: [
                                 Tab(
-                                  icon: Image.asset('assets/images/clips.png'),
-                                ),
+                                    icon:
+                                        Image.asset('assets/images/clips.png')),
                                 Tab(
                                   icon: Image.asset('assets/images/like.png'),
                                 ),
                                 Tab(
-                                  icon: Image.asset('assets/images/gift.png'),
-                                ),
+                                    icon:
+                                        Image.asset('assets/images/gift.png')),
                               ],
+                              onTap: (index) {},
                             ),
                             Expanded(
                               child: TabBarView(
@@ -394,10 +379,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         )
                                                       : Container(
                                                           margin:
-                                                              EdgeInsets.all(
-                                                                  35),
+                                                              const EdgeInsets
+                                                                  .all(35),
                                                           child:
-                                                              CircularProgressIndicator(
+                                                              const CircularProgressIndicator(
                                                             strokeWidth: 2,
                                                           ),
                                                         ),
@@ -406,26 +391,32 @@ class _ProfilePageState extends State<ProfilePage> {
                                             );
                                           },
                                         )
-                                      : const Text('No Posts'),
-                                  GridView.builder(
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 3,
-                                            mainAxisSpacing: 5,
-                                            crossAxisSpacing: 5),
-                                    itemCount: 5,
-                                    itemBuilder: (context, index) {
-                                      return Container(
-                                        height: 600.h,
-                                        width: 113.w,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          color: Colors.grey.shade50,
+                                      : const Center(
+                                          child: Text('there is no post')),
+                                  data['post_favorites_count'] == 0
+                                      ? GridView.builder(
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 3,
+                                                  mainAxisSpacing: 5,
+                                                  crossAxisSpacing: 5),
+                                          itemCount: 5,
+                                          itemBuilder: (context, index) {
+                                            return Container(
+                                              height: 600.h,
+                                              width: 113.w,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                color: Colors.grey.shade50,
+                                              ),
+                                            );
+                                          },
+                                        )
+                                      : const Center(
+                                          child: Text(
+                                              'This services not available at this time'),
                                         ),
-                                      );
-                                    },
-                                  ),
                                   const Center(
                                     child: Text(
                                         'This services not available at this time'),

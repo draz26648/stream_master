@@ -7,13 +7,9 @@ import 'package:stream_master/ui/screens/progress_hud.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
-import '../../get/general_controller.dart';
-
-
-
+import '../../controllers/general_controller.dart';
 import '../widgets/constants.dart';
 import '../widgets/tikTokVideoButtonColumn.dart';
-
 
 class CreatVideo extends StatefulWidget {
   @override
@@ -23,9 +19,9 @@ class CreatVideo extends StatefulWidget {
 class _CreatVideoState extends State<CreatVideo> {
   AssetEntity? entity;
   Uint8List? data;
-  ProgressHUD ?_progressHUD;
+  ProgressHUD? _progressHUD;
   bool _loading = true;
-  bool isFirstTime=false;
+  bool isFirstTime = false;
 
   AssetEntity? entity1;
   Uint8List? data1;
@@ -35,15 +31,16 @@ class _CreatVideoState extends State<CreatVideo> {
     final double scale = MediaQuery.of(context).devicePixelRatio;
     final AssetEntity? _entity = await CameraPicker.pickFromCamera(
       context,
+      
       theme: CameraPicker.themeData(color1),
+      
       enableRecording: true,
+      onlyEnableRecording: true,
       maximumRecordingDuration: const Duration(seconds: 30),
-
       textDelegate: EnglishCameraPickerTextDelegateWithRecording(),
-
     );
     setState(() {
-      _loading=false;
+      _loading = false;
     });
     if (_entity != null && entity != _entity) {
       entity = _entity;
@@ -63,8 +60,8 @@ class _CreatVideoState extends State<CreatVideo> {
 
       if (mounted) {
         GeneralDataController.to.videoPath = await entity!.file;
-        setState(()  {
-          _loading=true;
+        setState(() {
+          _loading = true;
           Navigator.of(context).push(MaterialPageRoute(
             fullscreenDialog: true,
             builder: (context) => PostVideoScreen(
@@ -76,21 +73,16 @@ class _CreatVideoState extends State<CreatVideo> {
     }
   }
 
-
-
   void _onImageButtonPressed() async {
     final double scale = MediaQuery.of(context).devicePixelRatio;
-    List<AssetEntity>? assets = await AssetPicker.pickAssets(
-        context,
+    List<AssetEntity>? assets = await AssetPicker.pickAssets(context,
         maxAssets: 1,
         textDelegate: EnglishTextDelegate(),
         requestType: RequestType.video,
-        themeColor: color1
-    );
-    AssetEntity? _entity=assets!.first;
+        themeColor: color1);
+    AssetEntity? _entity = assets!.first;
     setState(() {
-      _loading=false;
-
+      _loading = false;
     });
     if (entity != _entity) {
       entity = _entity;
@@ -112,7 +104,7 @@ class _CreatVideoState extends State<CreatVideo> {
       if (mounted) {
         GeneralDataController.to.videoPath = await entity!.file;
         setState(() {
-          _loading=true;
+          _loading = true;
           Navigator.of(context).push(MaterialPageRoute(
             fullscreenDialog: true,
             builder: (context) => PostVideoScreen(
@@ -123,8 +115,6 @@ class _CreatVideoState extends State<CreatVideo> {
       }
     }
   }
-
-
 
   @override
   void initState() {
@@ -139,16 +129,16 @@ class _CreatVideoState extends State<CreatVideo> {
       text: 'Loading...',
     );
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      isFirstTime=true;
-      if(_progressHUD !=null){
-        _loading?_progressHUD!.state!.dismiss():_progressHUD!.state!.show();
+      isFirstTime = true;
+      if (_progressHUD != null) {
+        _loading ? _progressHUD!.state!.dismiss() : _progressHUD!.state!.show();
       }
     });
   }
 
   @override
   void didUpdateWidget(covariant CreatVideo oldWidget) {
-    if(_progressHUD==null){
+    if (_progressHUD == null) {
       _progressHUD = ProgressHUD(
         backgroundColor: Colors.black12,
         color: Colors.white,
@@ -157,7 +147,7 @@ class _CreatVideoState extends State<CreatVideo> {
         text: 'Loading...',
       );
     }
-    
+
     super.didUpdateWidget(oldWidget);
   }
 
@@ -257,25 +247,22 @@ class _CreatVideoState extends State<CreatVideo> {
             _SidePhotoButton(title: 'Props'),
             Expanded(
                 child: Center(
-                  child: InkWell(
-                      child: Container(
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                            style: BorderStyle.solid,
-                            color: Colors.white.withOpacity(0.4),
-                            width: 6,
-                          ),
-                        ),
+              child: InkWell(
+                  child: Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        style: BorderStyle.solid,
+                        color: Colors.white.withOpacity(0.4),
+                        width: 6,
                       ),
-
-                      onTap:() => pick(context)
-
+                    ),
                   ),
-                )),
+                  onTap: () => pick(context)),
+            )),
             InkWell(
               child: _SidePhotoButton(title: 'Upload'),
               onTap: () {
@@ -298,8 +285,8 @@ class _CreatVideoState extends State<CreatVideo> {
         rightButtons,
       ],
     );
-    if(isFirstTime){
-      _loading?_progressHUD!.state!.dismiss():_progressHUD!.state!.show();
+    if (isFirstTime) {
+      _loading ? _progressHUD!.state!.dismiss() : _progressHUD!.state!.show();
     }
     return Scaffold(
       backgroundColor: Colors.black,
@@ -307,7 +294,6 @@ class _CreatVideoState extends State<CreatVideo> {
         child: body,
       ),
     );
-
   }
 }
 
@@ -340,7 +326,6 @@ class _SidePhotoButton extends StatelessWidget {
         Container(height: 2),
         Text(
           title!,
-
         )
       ],
     );

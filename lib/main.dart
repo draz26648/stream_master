@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:stream_master/ui/screens/auth/email_login.dart';
+import 'package:stream_master/ui/screens/auth/email_signup.dart';
+import 'package:stream_master/ui/screens/auth/phone_signup.dart';
+import 'package:stream_master/ui/screens/auth/sign_up_method.dart';
 import 'package:stream_master/ui/screens/edit_profile_screen.dart';
 import 'package:stream_master/ui/screens/nav.dart';
-import 'package:stream_master/ui/screens/out_bording_screen/birth_date.dart';
-import 'package:stream_master/ui/screens/out_bording_screen/congrats_screen.dart';
-import 'package:stream_master/ui/screens/out_bording_screen/gender_screen.dart';
-import 'package:stream_master/ui/screens/out_bording_screen/go_watching.dart';
-import 'package:stream_master/ui/screens/out_bording_screen/interests_screen.dart';
-import 'package:stream_master/ui/screens/out_bording_screen/splash_screen.dart';
-import 'package:stream_master/ui/screens/signup_method/email_login.dart';
-import 'package:stream_master/ui/screens/signup_method/email_signup.dart';
-import 'package:stream_master/ui/screens/signup_method/phone_signup.dart';
-import 'package:stream_master/ui/screens/signup_method/sign_up_method.dart';
-
-import 'get/general_controller.dart';
-import 'get/profile_controller.dart';
+import 'package:stream_master/ui/screens/out_bording/gender_screen.dart';
+import 'package:stream_master/ui/screens/out_bording/go_watching.dart';
+import 'package:stream_master/ui/screens/out_bording/interests_screen.dart';
+import 'package:stream_master/ui/screens/out_bording/splash_screen.dart';
+import 'controllers/general_controller.dart';
+import 'controllers/profile_controller.dart';
 import 'helper/shared_prefrences_helper.dart';
-
+import 'ui/screens/out_bording/birth_date.dart';
+import 'ui/screens/out_bording/congrats_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

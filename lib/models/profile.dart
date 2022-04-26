@@ -1,21 +1,37 @@
-class Profile {
-  int? id;
-  String? name;
-  String? email;
-  String? mobile;
-  String? avatar;
-  String? createdAt;
-  String? emailNotification;
-  String? smsNotification;
-  Null? description;
-  String? postsCount;
-  String? postCommentsCount;
-  String? postFavoritesCount;
-  String? commentFavoritesCount;
-  bool? isFollow;
 
-  Profile(
-      {this.id,
+import 'dart:convert';
+
+ProfileModel profileFromJson(String str) => ProfileModel.fromJson(json.decode(str));
+
+String profileToJson(ProfileModel data) => json.encode(data.toJson());
+
+class ProfileModel {
+    ProfileModel({
+        this.status,
+        this.message,
+        this.data,
+    });
+
+    bool? status;
+    String? message;
+    Data? data;
+
+    factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
+        status: json["status"],
+        message: json["message"],
+        data: Data.fromJson(json["data"]),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "status": status,
+        "message": message,
+        "data": data!.toJson(),
+    };
+}
+
+class Data {
+    Data({
+        this.id,
         this.name,
         this.email,
         this.mobile,
@@ -24,45 +40,75 @@ class Profile {
         this.emailNotification,
         this.smsNotification,
         this.description,
+        this.username,
+        this.verifyCode,
         this.postsCount,
         this.postCommentsCount,
         this.postFavoritesCount,
         this.commentFavoritesCount,
-        this.isFollow});
+        this.followersCount,
+        this.followingsCount,
+        this.isFollow,
+    });
 
-  Profile.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    email = json['email'];
-    mobile = json['mobile'];
-    avatar = json['avatar'];
-    createdAt = json['created_at'];
-    emailNotification = json['email_notification'];
-    smsNotification = json['sms_notification'];
-    description = json['description'];
-    postsCount = json['posts_count'];
-    postCommentsCount = json['post_comments_count'];
-    postFavoritesCount = json['post_favorites_count'];
-    commentFavoritesCount = json['comment_favorites_count'];
-    isFollow = json['is_follow'];
-  }
+    int? id;
+    String? name;
+    String? email;
+    String? mobile;
+    String? avatar;
+    DateTime? createdAt;
+    String? emailNotification;
+    String? smsNotification;
+    dynamic description;
+    String? username;
+    String? verifyCode;
+    String? postsCount;
+    String? postCommentsCount;
+    String? postFavoritesCount;
+    String? commentFavoritesCount;
+    String? followersCount;
+    String? followingsCount;
+    bool? isFollow;
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['mobile'] = this.mobile;
-    data['avatar'] = this.avatar;
-    data['created_at'] = this.createdAt;
-    data['email_notification'] = this.emailNotification;
-    data['sms_notification'] = this.smsNotification;
-    data['description'] = this.description;
-    data['posts_count'] = this.postsCount;
-    data['post_comments_count'] = this.postCommentsCount;
-    data['post_favorites_count'] = this.postFavoritesCount;
-    data['comment_favorites_count'] = this.commentFavoritesCount;
-    data['is_follow'] = this.isFollow;
-    return data;
-  }
+    factory Data.fromJson(Map<String, dynamic> json) => Data(
+        id: json["id"],
+        name: json["name"],
+        email: json["email"],
+        mobile: json["mobile"],
+        avatar: json["avatar"],
+        createdAt: DateTime.parse(json["created_at"]),
+        emailNotification: json["email_notification"],
+        smsNotification: json["sms_notification"],
+        description: json["description"],
+        username: json["username"],
+        verifyCode: json["verify_code"],
+        postsCount: json["posts_count"],
+        postCommentsCount: json["post_comments_count"],
+        postFavoritesCount: json["post_favorites_count"],
+        commentFavoritesCount: json["comment_favorites_count"],
+        followersCount: json["followers_count"],
+        followingsCount: json["followings_count"],
+        isFollow: json["is_follow"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "email": email,
+        "mobile": mobile,
+        "avatar": avatar,
+        "created_at": createdAt!.toIso8601String(),
+        "email_notification": emailNotification,
+        "sms_notification": smsNotification,
+        "description": description,
+        "username": username,
+        "verify_code": verifyCode,
+        "posts_count": postsCount,
+        "post_comments_count": postCommentsCount,
+        "post_favorites_count": postFavoritesCount,
+        "comment_favorites_count": commentFavoritesCount,
+        "followers_count": followersCount,
+        "followings_count": followingsCount,
+        "is_follow": isFollow,
+    };
 }

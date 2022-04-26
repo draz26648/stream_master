@@ -42,6 +42,10 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow app to use camera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>allow app to user microphone</string>
 	<false/>
 </dict>
 </plist>

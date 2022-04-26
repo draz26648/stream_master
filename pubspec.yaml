@@ -33,6 +33,7 @@ dependencies:
   http_parser: ^4.0.0
   http: ^0.13.4
   fluttertoast: ^8.0.9
+  camera: ^0.9.4+4
 
 dev_dependencies:
   flutter_test:
@@ -44,8 +45,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  remove_alpha_ios: true
-  image_path: "assets/images/main_logo.PNG"
+  image_path: "assets/images/logo.png"
 
 flutter:
   uses-material-design: true
@@ -53,8 +53,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/videos/
-    - assets/
 
   # example:
   fonts:

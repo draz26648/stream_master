@@ -1,15 +1,17 @@
-import 'dart:async';
-
 import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:stream_master/get/video_controller.dart';
+
 import 'package:stream_master/ui/screens/comment_screen.dart';
+import 'package:stream_master/ui/screens/profile_screen.dart';
 
 import '../../api/stream_web_services.dart';
-import '../../get/general_controller.dart';
+
+import '../../constant.dart';
+import '../../controllers/general_controller.dart';
+import '../../controllers/video_controller.dart';
 import '../../models/Post.dart';
 import '../../utils.dart';
 import '../widgets/video_player_item.dart';
@@ -26,12 +28,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<dynamic> data;
+  String likeCount = '0';
 
   bool isloading = false;
 
   final GeneralDataController _controller = GeneralDataController.to;
 
-  final VideoController _videoController = VideoController();
+  // final VideoController _videoController = VideoController();
 
   getPost() async {
     setState(() {
@@ -76,10 +79,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Color color = Colors.white;
-
-  // goToComment(BuildContext context) {
-  //   Navigator.push(context, MaterialPageRoute(builder: ((context) => CommentScreen())));
-  // }
 
   buildMusicAlbum(String profilePhoto) {
     return SizedBox(
@@ -155,6 +154,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  bool isLike = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,7 +177,6 @@ class _HomePageState extends State<HomePage> {
                       return Stack(
                         children: [
                           VideoPlayerItem(
-                            // ignore: invalid_use_of_protected_member
                             videoUrl: _controller.postData.value[index].path!,
                           ),
                           Column(
@@ -198,11 +198,7 @@ class _HomePageState extends State<HomePage> {
                                               MainAxisAlignment.spaceEvenly,
                                           children: [
                                             Text(
-                                              _controller
-                                                  // ignore: invalid_use_of_protected_member
-                                                  .postData
-                                                  .value[index]
-                                                  .title!,
+                                              '@${_controller.postData.value[index].user!.name!}',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 16.sp,
@@ -234,10 +230,8 @@ class _HomePageState extends State<HomePage> {
                                                   width: 10.w,
                                                 ),
                                                 Text(
-                                                  _controller
-                                                      .postData
-                                                      .value[index]
-                                                      .descriptionData!,
+                                                  _controller.postData
+                                                      .value[index].title!,
                                                   style: const TextStyle(
                                                     fontSize: 17,
                                                     fontWeight: FontWeight.w700,
@@ -261,21 +255,20 @@ class _HomePageState extends State<HomePage> {
                                                   .size
                                                   .height /
                                               5),
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            // buildProfile(videos[index].profilePhoto),
-                                            Column(
-                                              children: [
-                                                InkWell(
-                                                  child: Container(
-                                                    width: 55.w,
-                                                    height: 55.h,
-                                                    child: Stack(
-                                                      children: [
-                                                        Container(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              InkWell(
+                                                child: Container(
+                                                  width: 55.w,
+                                                  height: 55.h,
+                                                  child: Stack(
+                                                    children: [
+                                                      InkWell(
+                                                        child: Container(
                                                           height: 50.h,
                                                           width: 50.w,
                                                           decoration:
@@ -297,201 +290,194 @@ class _HomePageState extends State<HomePage> {
                                                                     .cover),
                                                           ),
                                                         ),
-                                                        Positioned(
-                                                          bottom: 0,
-                                                          left: 18.w,
-                                                          child: InkWell(
-                                                            onTap: () {
-                                                              checkLogin(
-                                                                  context, () {
-                                                                Controller()
-                                                                    .addFllow(
-                                                                        user_id: _controller
-                                                                            .postData
-                                                                            .value[
-                                                                                index]
-                                                                            .user!
-                                                                            .id)
-                                                                    .then(
-                                                                        (value) {
-                                                                  if (value
-                                                                      .containsKey(
-                                                                          "message")) {
-                                                                    Navigator.of(
-                                                                            context,
-                                                                            rootNavigator:
-                                                                                true)
-                                                                        .pop();
-                                                                    showAlertDialog(
-                                                                        context,
-                                                                        value[
-                                                                            'message']);
-                                                                  } else {
-                                                                    _controller
-                                                                        .changeIsFollowState(
-                                                                            index);
-                                                                  }
-                                                                });
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder: (_) =>
+                                                                      ProfilePage(
+                                                                        isSelfPage:
+                                                                            false,
+                                                                      )));
+                                                        },
+                                                      ),
+                                                      Positioned(
+                                                        bottom: 0,
+                                                        left: 18.w,
+                                                        child: InkWell(
+                                                          onTap: () {
+                                                            checkLogin(context,
+                                                                () {
+                                                              Controller()
+                                                                  .addFllow(
+                                                                      user_id: _controller
+                                                                          .postData
+                                                                          .value[
+                                                                              index]
+                                                                          .user!
+                                                                          .id)
+                                                                  .then(
+                                                                      (value) {
+                                                                if (value[
+                                                                        'status'] !=
+                                                                    true) {
+                                                                  showAlertDialog(
+                                                                      context,
+                                                                      value[
+                                                                          'message']);
+                                                                } else {
+                                                                  _controller
+                                                                      .changeIsFollowState(
+                                                                          index);
+                                                                }
                                                               });
-                                                            },
-                                                            child: Visibility(
-                                                              visible:
-                                                                  !_controller
-                                                                      .postData
-                                                                      .value[
-                                                                          index]
-                                                                      .user!
-                                                                      .isFollow!,
-                                                              child: Container(
-                                                                width: 20.w,
-                                                                height: 20.h,
-                                                                decoration: BoxDecoration(
-                                                                    shape: BoxShape
-                                                                        .circle,
-                                                                    color: Colors
-                                                                        .blue),
-                                                                child:
-                                                                    const Center(
-                                                                  child: Icon(
-                                                                    Icons.add,
-                                                                    color: Colors
-                                                                        .white,
-                                                                    size: 15,
-                                                                  ),
+                                                            });
+                                                          },
+                                                          child: Visibility(
+                                                            visible: _controller
+                                                                .postData
+                                                                .value[index]
+                                                                .user!
+                                                                .isFollow!,
+                                                            child: Container(
+                                                              width: 20.w,
+                                                              height: 20.h,
+                                                              decoration: const BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .blue),
+                                                              child:
+                                                                  const Center(
+                                                                child: Icon(
+                                                                  Icons.add,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 15,
                                                                 ),
                                                               ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ],
-                                                    ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                                SizedBox(height: 20.h),
-                                                // InkWell(
-                                                //   child: Image.asset(
-                                                //     'assets/images/face.png',
-                                                //     width: 35.w,
-                                                //     height: 35.w,
-                                                //     fit: BoxFit.cover,
-                                                //   ),
-                                                // ),
-                                                // SizedBox(height: 20.h),
-                                                Column(
-                                                  children: [
-                                                    FavoriteButton(
-                                                      isFavorite: _controller
-                                                          .postData
-                                                          .value[index]
-                                                          .isFavorite,
-                                                      // Icons.favorite_outlined,
-                                                      iconSize: 45,
-                                                      iconColor: Colors.red,
-                                                      valueChanged:
-                                                          (_isFavorite) {
-                                                        checkLogin(context, () {
-                                                          // showLoaderDialog(context);
-                                                          Controller()
-                                                              .addLike(
-                                                                  post_id: _controller
-                                                                      .postData
-                                                                      .value[
-                                                                          index]
-                                                                      .id)
-                                                              .then((value) {
-                                                            _controller
-                                                                .changeFavoriteState(
-                                                                    index);
-
-                                                            // Navigator.of(context, rootNavigator: true).pop();
-                                                          });
+                                              ),
+                                              SizedBox(height: 20.h),
+                                              Column(
+                                                children: [
+                                                  FavoriteButton(
+                                                    isFavorite: _controller
+                                                        .postData
+                                                        .value[index]
+                                                        .isFavorite,
+                                                    iconSize: 45,
+                                                    iconColor: Colors.red,
+                                                    valueChanged:
+                                                        (_isFavorite) {
+                                                      checkLogin(context, () {
+                                                        Controller()
+                                                            .addLike(
+                                                                post_id:
+                                                                    _controller
+                                                                        .postData
+                                                                        .value[
+                                                                            index]
+                                                                        .id)
+                                                            .then((value) {
+                                                          _controller
+                                                              .changeFavoriteState(
+                                                                  index);
                                                         });
-                                                      },
+                                                        setState(() {
+                                                          likeCount = _controller
+                                                              .postData
+                                                              .value[index]
+                                                              .favoritesCount!;
+                                                        });
+                                                      });
+                                                    },
+                                                  ),
+                                                  Text(
+                                                    likeCount,
+                                                    style: TextStyle(
+                                                        fontSize: 10.sp,
+                                                        color: Colors.white),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 20.h),
+                                              InkWell(
+                                                onTap: () {
+                                                  showModalBottomSheet(
+                                                    isScrollControlled: true,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        CommentScreen(
+                                                            _controller
+                                                                .postData
+                                                                .value[index]
+                                                                .id,
+                                                            _controller
+                                                                .postData
+                                                                .value[index]
+                                                                .commentsCount),
+                                                  );
+                                                },
+                                                child: Column(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/messege.png',
+                                                      width: 40.h,
+                                                      height: 40.h,
+                                                      color: Colors.grey[400],
                                                     ),
                                                     Text(
                                                       _controller
                                                           .postData
                                                           .value[index]
-                                                          .favoritesCount!,
+                                                          .commentsCount
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 10.sp,
+                                                          color: Colors.white),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(height: 20.h),
+                                              InkWell(
+                                                onTap: () async {
+                                                  final urlPreview = _controller
+                                                      .postData
+                                                      .value[index]
+                                                      .path;
+                                                  await Share.share(
+                                                      '$urlPreview');
+                                                },
+                                                child: Column(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/share.png',
+                                                      width: 35.h,
+                                                      height: 35.h,
+                                                      color: Colors.grey[400],
+                                                    ),
+                                                    Text(
+                                                      '0',
                                                       style: TextStyle(
                                                           fontSize: 10.sp,
                                                           color: Colors.white),
                                                     ),
                                                   ],
                                                 ),
-                                                SizedBox(height: 20.h),
-                                                InkWell(
-                                                  onTap: () {
-                                                    showModalBottomSheet(
-                                                      isScrollControlled: true,
-                                                      backgroundColor:
-                                                          Colors.transparent,
-                                                      context: context,
-                                                      builder: (context) =>
-                                                          CommentScreen(
-                                                              _controller
-                                                                  .postData
-                                                                  .value[index]
-                                                                  .id,
-                                                              _controller
-                                                                  .postData
-                                                                  .value[index]
-                                                                  .commentsCount),
-                                                    );
-                                                    // builder: (context) => ShowVisitorComment(data: _controller.postComment,),);
-                                                  },
-                                                  // onTap: () => {goToComment(context)},
-                                                  child: Column(
-                                                    children: [
-                                                      Image.asset(
-                                                        'assets/images/messege.png',
-                                                        width: 40.h,
-                                                        height: 40.h,
-                                                      ),
-                                                      Text(
-                                                        _controller
-                                                            .postData
-                                                            .value[index]
-                                                            .commentsCount
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            fontSize: 10.sp,
-                                                            color:
-                                                                Colors.white),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 20.h),
-                                                InkWell(
-                                                  onTap: () async {
-                                                    final urlPreview =
-                                                        _controller.postData
-                                                            .value[index].path;
-                                                    await Share.share(
-                                                        '$urlPreview');
-                                                  },
-                                                  child: Column(
-                                                    children: [
-                                                      Image.asset(
-                                                        'assets/images/share.png',
-                                                        width: 35.h,
-                                                        height: 35.h,
-                                                      ),
-                                                      Text(
-                                                        '0',
-                                                        style: TextStyle(
-                                                            fontSize: 10.sp,
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
                                       ),
                                     ),
                                   ],
