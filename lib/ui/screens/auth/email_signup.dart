@@ -167,7 +167,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                         ),
                         Container(
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
-                          child: TextField(
+                          child: TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
@@ -205,9 +205,17 @@ class _EmailSignUpState extends State<EmailSignUp> {
                         ),
                         Container(
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
-                          child: TextField(
+                          child: TextFormField(
                             obscureText: _isObscure,
                             controller: _passwordController,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter password';
+                              } else if (value.length < 8) {
+                                return 'Password must be atleast 8 characters';
+                              }
+                              return null;
+                            },
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               suffixIcon: IconButton(
@@ -258,9 +266,15 @@ class _EmailSignUpState extends State<EmailSignUp> {
                         Container(
                           margin: EdgeInsets.only(
                               left: 16.w, right: 16.w, top: 10.h),
-                          child: TextField(
+                          child: TextFormField(
                             obscureText: _isObscure,
                             controller: _confirmController,
+                            validator: (value) {
+                              if (value! == _passwordController.text) {
+                                return 'Password does not match';
+                              }
+                              return null;
+                            },
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               suffixIcon: IconButton(
@@ -333,10 +347,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                                 print("Register ${value}");
 
                                 if (value['status'] != true) {
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop();
-
-                                  showAlertDialog(context, value['message']);
+                                  Fluttertoast.showToast(msg: value['message']);
                                 } else {
                                   Fluttertoast.showToast(msg: value['message']);
                                   SharedPrefrencesHelper.sharedPrefrencesHelper
@@ -373,21 +384,8 @@ class _EmailSignUpState extends State<EmailSignUp> {
   }
 
   showLoaderDialog(BuildContext context) {
-    AlertDialog alert = AlertDialog(
-      content: new Row(
-        children: [
-          CircularProgressIndicator(),
-          Container(
-              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
-        ],
-      ),
-    );
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
+    const CircularProgressIndicator(
+      color: Colors.black,
     );
   }
 

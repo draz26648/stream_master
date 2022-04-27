@@ -33,7 +33,7 @@ dependencies:
   http_parser: ^4.0.0
   http: ^0.13.4
   fluttertoast: ^8.0.9
-  camera: ^0.9.4+4
+  like_button: ^2.0.4
 
 dev_dependencies:
   flutter_test:

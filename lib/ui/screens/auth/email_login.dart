@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:stream_master/models/login_model.dart';
 
 import '../../../api/stream_web_services.dart';
@@ -119,8 +120,14 @@ class _EmailSignInState extends State<EmailSignIn> {
                         ),
                         Container(
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
-                          child: TextField(
+                          child: TextFormField(
                             controller: _emailController,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter username or email';
+                              }
+                              return null;
+                            },
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
                               contentPadding:
@@ -157,9 +164,17 @@ class _EmailSignInState extends State<EmailSignIn> {
                         ),
                         Container(
                           margin: EdgeInsets.only(left: 16.w, right: 16.w),
-                          child: TextField(
+                          child: TextFormField(
                             obscureText: _isObscure,
                             controller: _passwordController,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter password';
+                              } else if (value.length < 8) {
+                                return 'Password must be atleast 8 characters';
+                              }
+                              return null;
+                            },
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               suffixIcon: IconButton(
@@ -212,15 +227,12 @@ class _EmailSignInState extends State<EmailSignIn> {
                               showLoaderDialog(context);
                               var email = _emailController.text;
                               var password = _passwordController.text;
-                              // print(email+password);
+
                               Controller()
                                   .Login(email: email, password: password)
                                   .then((value) {
                                 if (value['status'] != true) {
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop();
-
-                                  showAlertDialog(context, value.message!);
+                                  Fluttertoast.showToast(msg: value['message']);
                                 } else {
                                   SharedPrefrencesHelper.sharedPrefrencesHelper
                                       .setIsLogin(true);
@@ -290,21 +302,8 @@ class _EmailSignInState extends State<EmailSignIn> {
   }
 
   showLoaderDialog(BuildContext context) {
-    AlertDialog alert = AlertDialog(
-      content: new Row(
-        children: [
-          CircularProgressIndicator(),
-          Container(
-              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
-        ],
-      ),
-    );
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
+    const CircularProgressIndicator(
+      color: Colors.black,
     );
   }
 }

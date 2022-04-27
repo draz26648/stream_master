@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:stream_master/helper/shared_prefrences_helper.dart';
 import 'package:stream_master/models/comments_model.dart';
 
 import '../../api/stream_web_services.dart';
@@ -192,69 +193,80 @@ class _CommentScreenState extends State<CommentScreen> {
                         EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
                     height: 86.h,
                     color: Color(0xff434343),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          radius: 20.r,
-                          backgroundImage: NetworkImage(profilePic!),
-                        ),
-                        SizedBox(
-                          width: 10.w,
-                        ),
-                        Container(
-                          width: 264.w,
-                          child: TextFormField(
-                            controller: _commentController,
-                            style: TextStyle(),
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  vertical: 10.h, horizontal: 20.w),
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: 'Add Comment',
-                              // hintText: SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin() != null? 'Comment as ${}' : 'Add Comment',
-                              hintStyle: TextStyle(
-                                  color: color1, fontFamily: 'poppins'),
-                              labelStyle: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15.r),
-                                borderSide: BorderSide(color: Colors.grey),
+                    child: SharedPrefrencesHelper
+                                .sharedPrefrencesHelper.getToken !=
+                            null
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                radius: 20.r,
+                                backgroundImage:
+                                    AssetImage('assets/images/person.png'),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15.r),
-                                borderSide: BorderSide(color: Colors.white),
+                              SizedBox(
+                                width: 10.w,
                               ),
-                            ),
+                              Container(
+                                width: 264.w,
+                                child: TextFormField(
+                                  controller: _commentController,
+                                  style: TextStyle(),
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10.h, horizontal: 20.w),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    hintText: 'Add Comment',
+                                    hintStyle: TextStyle(
+                                        color: color1, fontFamily: 'poppins'),
+                                    labelStyle: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.r),
+                                      borderSide:
+                                          BorderSide(color: Colors.grey),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.r),
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  if (_commentController.text.isNotEmpty) {
+                                    checkLogin(context, () {
+                                      Controller().addComment(
+                                          post_id: widget.postId,
+                                          description: _commentController.text);
+                                      setState(() {
+                                        getComment();
+                                      });
+                                      _commentController.clear();
+                                    });
+                                  } else {
+                                    var snackBar = const SnackBar(
+                                      content: Text('fill the comment filed'),
+                                    );
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
+                                  }
+                                },
+                                icon: Image.asset(
+                                  'assets/images/sendss.png',
+                                  width: 50.w,
+                                  height: 50.h,
+                                ),
+                              ),
+                            ],
+                          )
+                        : const Center(
+                            child: Text('Login to comment'),
                           ),
-                        ),
-                        // SizedBox(width: 10.w),
-                        IconButton(
-                          onPressed: () {
-                            if (_commentController.text.isNotEmpty) {
-                              checkLogin(context, () {
-                                Controller().addComment(
-                                    post_id: widget.postId,
-                                    description: _commentController.text);
-                              });
-                            } else {
-                              var snackBar = SnackBar(
-                                content: Text('fill the comment filed'),
-                              );
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
-                            }
-                          },
-                          icon: Image.asset(
-                            'assets/images/sendss.png',
-                            width: 50.w,
-                            height: 50.h,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
