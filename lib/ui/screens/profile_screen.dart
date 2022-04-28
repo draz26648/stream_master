@@ -13,6 +13,7 @@ import '../../controllers/profile_controller.dart';
 import '../../models/profile.dart';
 
 class ProfilePage extends StatefulWidget {
+  final int? userId;
   final bool canPop;
   final bool isSelfPage;
   final Function? onPop;
@@ -23,7 +24,7 @@ class ProfilePage extends StatefulWidget {
     this.canPop: false,
     this.onPop,
     required this.isSelfPage,
-    this.onSwitch,
+    this.onSwitch, required this.userId,
   }) : super(key: key);
 
   @override
@@ -45,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
       isloading = true;
     });
     try {
-      Controller().getProfile().then((value) => {
+      Controller().getProfile(widget.userId).then((value) => {
             setState(() {
               isloading = false;
             }),
@@ -176,7 +177,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             icon: Image.asset(
                                                 'assets/images/scan.png'),
                                           ),
-                                          IconButton(
+                                        widget.isSelfPage?  IconButton(
                                             onPressed: () {
                                               Navigator.push(
                                                   context,
@@ -187,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             icon: Image.asset(
                                               'assets/images/setting.png',
                                             ),
-                                          ),
+                                          ) : Container(),
                                         ],
                                       ),
                                     ),
@@ -304,7 +305,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             color: Colors.white),
                                       ),
                                     ),
-                                    Container(
+                                  widget.isSelfPage? Container(
                                       margin: EdgeInsets.all(10.w),
                                       width: double.infinity,
                                       child: ElevatedButton(
@@ -328,7 +329,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               color: Colors.black),
                                         ),
                                       ),
-                                    ),
+                                    ):Container(),
                                   ],
                                 ),
                               ),

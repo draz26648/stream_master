@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../widgets/constants.dart';
 
-
 class GoWatching extends StatefulWidget {
   const GoWatching({Key? key}) : super(key: key);
 
@@ -21,6 +20,8 @@ class _GoWatchingState extends State<GoWatching> {
         child: Column(
           children: [
             Container(
+              height: MediaQuery.of(context).size.height *0.05,
+              width: MediaQuery.of(context).size.width,
               margin: EdgeInsets.only(left: 16.w, top: 46.3.h, bottom: 2.h),
               child: Row(
                 children: [
@@ -75,11 +76,14 @@ class _GoWatchingState extends State<GoWatching> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/Nav_screen' );
+                  Navigator.pushReplacementNamed(context, '/Nav_screen');
                 },
                 child: Text(
                   'Start Watching',
-                  style: TextStyle(fontSize: 16.sp, fontFamily: 'poppins', color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 16.sp,
+                      fontFamily: 'poppins',
+                      color: Colors.white),
                 ),
               ),
             ),

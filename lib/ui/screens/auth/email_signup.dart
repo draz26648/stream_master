@@ -356,8 +356,7 @@ class _EmailSignUpState extends State<EmailSignUp> {
                                       .setToken(value['data']['token']);
                                   Navigator.pushReplacementNamed(
                                       context, '/congrats_screen');
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop();
+                                  
                                 }
                               });
 

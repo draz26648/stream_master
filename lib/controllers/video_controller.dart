@@ -14,7 +14,7 @@ class VideoController extends GetxController {
   void onInit() {
     super.onInit();
 
-    _controller!.getPost().then((value) {
+    _controller!.getPost(1).then((value) {
       if (value != null) {
         postData = value['data'];
       }

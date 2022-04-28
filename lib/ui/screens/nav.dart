@@ -29,10 +29,11 @@ class _NavScreenState extends State<NavScreen> {
     ),
     const DiscoverPage(),
     CreatVideo(),
-    // ShootPage(),
+    // CameraPage(),
     const Scaffold(),
     const ProfilePage(
       isSelfPage: true,
+      userId: 0,
     ),
   ];
 

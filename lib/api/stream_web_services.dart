@@ -96,8 +96,64 @@ class Controller {
     }
   }
 
+  //logout web service
+  Future<dynamic> logout()async{
+    var header;
+    String token = '${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}';
+    header = <String, String>{
+        
+        'Authorization':
+            'Bearer $token',
+        'Accept': 'application/json'
+      };
+      var res = await http.post(Uri.parse("$apiurl/logout"),
+        headers: header,
+      );
+      final data = await json.decode(res.body);
+      if (res.statusCode == 200) {
+        print(data);
+        await SharedPrefrencesHelper.sharedPrefrencesHelper.setIsLogin(false);
+               await SharedPrefrencesHelper.sharedPrefrencesHelper.logout(
+                    token);
+        return data;
+      } else {
+        return data;
+      }
+  }
+
 //home videos web service
-  Future<dynamic> getPost() async {
+  Future<dynamic> getPost(int? page) async {
+    var header;
+    if (SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin()!) {
+      print(
+          "is login ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}");
+      header = <String, String>{
+        'Context-Type': 'application/json;charSet=UTF-8',
+        'Authorization':
+            'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
+        'Accept': 'application/json'
+      };
+    } else {
+      header = <String, String>{
+        'Context-Type': 'application/json;charSet=UTF-8'
+      };
+      print('you are in gust mode');
+    }
+    var res = await http.get(Uri.parse("$apiurl/posts?page=$page"), headers: header);
+
+    final Map<String, dynamic> map = await json.decode(res.body);
+    final Map<String, dynamic> data1 = map['data'];
+    final List<dynamic> data = data1['data'];
+    if (res.statusCode == 200) {
+      print(data);
+      return data;
+    } else {
+      return print(map['message']);
+    }
+  }
+
+  //get videos pages counts
+  Future<dynamic> getPostPages() async {
     var header;
     if (SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin()!) {
       print(
@@ -117,8 +173,30 @@ class Controller {
     var res = await http.get(Uri.parse("$apiurl/posts"), headers: header);
 
     final Map<String, dynamic> map = await json.decode(res.body);
-    final Map<String, dynamic> data1 = map['data'];
-    final List<dynamic> data = data1['data'];
+
+    final List<dynamic> data = map['data'] as List;
+    if (res.statusCode == 200) {
+      print(data);
+      return data;
+    } else {
+      return print(map['message']);
+    }
+  }
+
+  //search web Service
+
+  Future<dynamic> getSearchResult(String? query) async {
+    var header;
+    header = <String, String>{
+      'Context-Type': 'application/json;charSet=UTF-8',
+      'Authorization':
+          'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
+      'Accept': 'application/json'
+    };
+    var res =
+        await http.get(Uri.parse("$apiurl/search?q=$query"), headers: header);
+    final Map<String, dynamic> map = await json.decode(res.body);
+    final List<dynamic> data = map['data']['posts'];
     if (res.statusCode == 200) {
       print(data);
       return data;
@@ -128,7 +206,23 @@ class Controller {
   }
 
 // comments web service
-  Future<dynamic> getComment(postId) async {
+  Future<dynamic> getComment(postId,int? pageid) async {
+    var res = await http.get(
+      Uri.parse("$apiurl/comments?post_id=$postId&page=$pageid"),
+      headers: <String, String>{
+        'Context-Type': 'application/json;charSet=UTF-8'
+      },
+    );
+    final Map<String, dynamic> map = await json.decode(res.body);
+    final List<dynamic> data = map['data']['data'];
+    if (res.statusCode == 200) {
+      print(data);
+      return data;
+    } else {
+      return data;
+    }
+  }
+    Future<dynamic> getCommentPages(postId) async {
     var res = await http.get(
       Uri.parse("$apiurl/comments?post_id=$postId"),
       headers: <String, String>{
@@ -136,7 +230,7 @@ class Controller {
       },
     );
     final Map<String, dynamic> map = await json.decode(res.body);
-    final List<dynamic> data = map['data']['data'];
+    final List<dynamic> data = map['data'];
     if (res.statusCode == 200) {
       print(data);
       return data;
@@ -255,10 +349,10 @@ class Controller {
 
   // get profile info web service
 
-  Future<dynamic> getProfile() async {
+  Future<dynamic> getProfile(int? user_id) async {
     print(" ffffg ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}");
     var res = await http.get(
-      Uri.parse("$apiurl/profile"),
+      Uri.parse("$apiurl/profile?user_id=$user_id"),
       headers: <String, String>{
         'Context-Type': 'application/json;charSet=UTF-8',
         'Authorization':

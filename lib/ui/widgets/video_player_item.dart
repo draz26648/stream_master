@@ -16,7 +16,7 @@ late  VideoPlayerController videoPlayerController;
 
   @override
   void initState() {
-     VideoPlayerController.network(widget.videoUrl)
+    videoPlayerController =  VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((value) {
         videoPlayerController.play();
         _isPlaying = true;

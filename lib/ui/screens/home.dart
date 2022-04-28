@@ -1,6 +1,7 @@
-import 'package:favorite_button/favorite_button.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:like_button/like_button.dart';
 import 'package:share_plus/share_plus.dart';
@@ -34,7 +35,9 @@ class _HomePageState extends State<HomePage> {
 
   bool isloading = false;
 
-
+  int currentPage = 1;
+  int currentVideo = 0;
+  int maxPage = 4;
 
   final GeneralDataController _controller = GeneralDataController.to;
 
@@ -45,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       isloading = true;
     });
     try {
-      Controller().getPost().then((value) => {
+      Controller().getPost(currentPage).then((value) => {
             setState(() {
               isloading = false;
             }),
@@ -68,6 +71,11 @@ class _HomePageState extends State<HomePage> {
                 print('there is no data here'),
               }
           });
+      Controller().getPostPages().then((value) => {
+            setState(() {
+              maxPage = value['last_page'];
+            }),
+          });
     } catch (e) {
       print(e);
       setState(() {
@@ -76,560 +84,638 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  PageController scrollController =
+      PageController(initialPage: 0, viewportFraction: 1);
+
   @override
   void initState() {
     getPost();
     super.initState();
+    scrollController.addListener(() {
+      setState(() {
+        currentVideo = scrollController.page!.toInt();
+      });
+      if (currentVideo >= 5 && currentPage < maxPage) {
+        setState(() {
+          currentPage++;
+          getPost();
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   Color color = Colors.white;
-
-  buildMusicAlbum(String profilePhoto) {
-    return SizedBox(
-      width: 60,
-      height: 60,
-      child: Column(
-        children: [
-          Container(
-              padding: const EdgeInsets.all(11),
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Colors.grey,
-                      Colors.white,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(25)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: Image(
-                  image: AssetImage(profilePhoto),
-                  fit: BoxFit.cover,
-                ),
-              ))
-        ],
-      ),
-    );
-  }
-
-  buildProfile(String profilePhoto) {
-    return SizedBox(
-      width: 60,
-      height: 60,
-      child: Stack(
-        children: [
-          Positioned(
-            left: 5,
-            child: Container(
-              width: 50,
-              height: 50,
-              margin: const EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.white),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: Image(
-                  image: AssetImage(profilePhoto),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-          const Positioned(
-            bottom: 2,
-            left: 23,
-            child: CircleAvatar(
-              backgroundColor: Colors.red,
-              radius: 8,
-              child: Icon(
-                Icons.add,
-                size: 10,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   bool isLike = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        backgroundColor: Colors.transparent,
-        extendBody: true,
-        body: isloading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : Obx(() {
-                print("data length is  ${_controller.postData.value.length}");
-                return PageView.builder(
-                    itemCount: _controller.postData.value.length,
-                    controller:
-                        PageController(initialPage: 0, viewportFraction: 1),
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      return Stack(
-                        children: [
-                          VideoPlayerItem(
-                            videoUrl: _controller.postData.value[index].path!,
-                            
-                          ),
-                          Column(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      body: isloading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Obx(() {
+              print("data length is  ${_controller.postData.value.length}");
+              return Column(
+                children: [
+                  Expanded(
+                    child: PageView.builder(
+                       
+                        itemCount: _controller.postData.value.length,
+                        controller: scrollController,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) {
+                          return Stack(
                             children: [
-                              const SizedBox(height: 100),
-                              Expanded(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        padding: EdgeInsets.only(left: 16.w),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Text(
-                                              '@${_controller.postData.value[index].user!.name!}',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16.sp,
-                                                fontFamily: 'poppins',
-                                                color: Colors.white,
+                              InkWell(
+                                onDoubleTap: () async {
+                                  // await checkLogin(context, () {
+                                  //   Controller()
+                                  //       .addLike(
+                                  //           post_id: _controller
+                                  //               .postData.value[index].id)
+                                  //       .then((value) {
+                                  //     if (value['status'] != true) {
+                                  //       showAlertDialog(
+                                  //           context, value['message']);
+                                  //     } else {
+                                  //       _controller.changeFavoriteState(index);
+                                  //     }
+                                  //   });
+
+                                  // });
+                                  Fluttertoast.showToast(
+                                      msg: 'this service is not available');
+                                },
+                                onLongPress: () {
+                                  showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      context: context,
+                                      builder: (context) {
+                                        return Container(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.3,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16.w),
+                                          decoration: BoxDecoration(
+                                            color: Color(0xff444444),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              const SizedBox(height: 15),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  IconButton(
+                                                    icon: const ImageIcon(
+                                                      AssetImage(
+                                                          'assets/images/pin.png'),
+                                                      size: 17.5,
+                                                      color: Colors.white,
+                                                    ),
+                                                    onPressed: () {},
+                                                  ),
+                                                  const Text(
+                                                    'Pin',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            SizedBox(height: 10.h),
-                                            Text(
-                                              // ignore: invalid_use_of_protected_member
-                                              _controller.postData.value[index]
-                                                  .description!,
-                                              style: TextStyle(
-                                                fontSize: 13.sp,
-                                                fontWeight: FontWeight.w700,
-                                                fontFamily: 'poppins',
-                                                color: Colors.white,
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  IconButton(
+                                                    icon: const ImageIcon(
+                                                      AssetImage(
+                                                          'assets/images/copyitem.png'),
+                                                      size: 17.5,
+                                                      color: Colors.white,
+                                                    ),
+                                                    onPressed: () {},
+                                                  ),
+                                                  const Text(
+                                                    'Copy',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            SizedBox(height: 14.h),
-                                            Row(
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  IconButton(
+                                                    icon: const ImageIcon(
+                                                      AssetImage(
+                                                          'assets/images/copylink.png'),
+                                                      size: 17.5,
+                                                      color: Colors.white,
+                                                    ),
+                                                    onPressed: () {},
+                                                  ),
+                                                  const Text(
+                                                    'Copy Link',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  IconButton(
+                                                    icon: const ImageIcon(
+                                                      AssetImage(
+                                                          'assets/images/report.png'),
+                                                      size: 17.5,
+                                                      color: Colors.white,
+                                                    ),
+                                                    onPressed: () {},
+                                                  ),
+                                                  const Text(
+                                                    'Report',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      });
+                                },
+                                child: VideoPlayerItem(
+                                  // ignore: invalid_use_of_protected_member
+                                  videoUrl:
+                                      _controller.postData.value[index].path!,
+                                ),
+                              ),
+                              Column(
+                                children: [
+                                  const SizedBox(height: 100),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            padding:
+                                                EdgeInsets.only(left: 16.w),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
                                               children: [
-                                                Image.asset(
-                                                  'assets/images/music.png',
-                                                  width: 30.w,
-                                                  height: 30.h,
+                                                InkWell(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                ProfilePage(
+                                                                  isSelfPage:
+                                                                      false,
+                                                                  userId: _controller
+                                                                      .postData
+                                                                      .value[
+                                                                          index]
+                                                                      .user!
+                                                                      .id!,
+                                                                )));
+                                                  },
+                                                  child: Text(
+                                                    '@${_controller.postData.value[index].user!.name!}',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16.sp,
+                                                      fontFamily: 'poppins',
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
                                                 ),
-                                                SizedBox(
-                                                  width: 10.w,
-                                                ),
+                                                SizedBox(height: 10.h),
                                                 Text(
-                                                  _controller.postData
-                                                      .value[index].title!,
-                                                  style: const TextStyle(
-                                                    fontSize: 17,
+                                                  // ignore: invalid_use_of_protected_member
+                                                  _controller
+                                                      .postData
+                                                      .value[index]
+                                                      .description!,
+                                                  style: TextStyle(
+                                                    fontSize: 13.sp,
                                                     fontWeight: FontWeight.w700,
                                                     fontFamily: 'poppins',
                                                     color: Colors.white,
                                                   ),
                                                 ),
+                                                SizedBox(height: 14.h),
+                                                Row(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/music.png',
+                                                      width: 30.w,
+                                                      height: 30.h,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 10.w,
+                                                    ),
+                                                    Text(
+                                                      _controller.postData
+                                                          .value[index].title!,
+                                                      style: const TextStyle(
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        fontFamily: 'poppins',
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 10.h,
+                                                ),
                                               ],
                                             ),
-                                            SizedBox(
-                                              height: 10.h,
-                                            ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 100,
-                                      margin: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                              5),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Column(
+                                        Container(
+                                          width: 100,
+                                          margin: EdgeInsets.only(
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height /
+                                                  5),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
                                             children: [
-                                              InkWell(
-                                                child: Container(
-                                                  width: 55.w,
-                                                  height: 55.h,
-                                                  child: Stack(
-                                                    children: [
-                                                      InkWell(
-                                                        child: Container(
-                                                          height: 50.h,
-                                                          width: 50.w,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .white),
-                                                            shape:
-                                                                BoxShape.circle,
-                                                            image: DecorationImage(
-                                                                image: NetworkImage(
-                                                                    _controller
+                                              Column(
+                                                children: [
+                                                  InkWell(
+                                                    child: Container(
+                                                      width: 55.w,
+                                                      height: 55.h,
+                                                      child: Stack(
+                                                        children: [
+                                                          InkWell(
+                                                            child: Container(
+                                                              height: 50.h,
+                                                              width: 50.w,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                border: Border.all(
+                                                                    color: Colors
+                                                                        .white),
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                image: DecorationImage(
+                                                                    image: NetworkImage(_controller
                                                                         .postData
                                                                         .value[
                                                                             index]
                                                                         .user!
                                                                         .avatar!),
-                                                                fit: BoxFit
-                                                                    .cover),
+                                                                    fit: BoxFit
+                                                                        .cover),
+                                                              ),
+                                                            ),
+                                                            onTap: () {
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (_) =>
+                                                                          ProfilePage(
+                                                                            isSelfPage:
+                                                                                false,
+                                                                            userId:
+                                                                                _controller.postData.value[index].user!.id!,
+                                                                          )));
+                                                            },
                                                           ),
-                                                        ),
-                                                        onTap: () {
-                                                          Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder: (_) =>
-                                                                      ProfilePage(
-                                                                        isSelfPage:
-                                                                            false,
-                                                                      )));
-                                                        },
-                                                      ),
-                                                      Positioned(
-                                                        bottom: 0,
-                                                        left: 18.w,
-                                                        // child: InkWell(
-                                                        //   onTap: () {
-                                                        //     checkLogin(
-                                                        //         context, () {
-                                                        //       Controller()
-                                                        //           .addFllow(
-                                                        //               user_id: _controller
-                                                        //                   .postData
-                                                        //                   .value[
-                                                        //                       index]
-                                                        //                   .user!
-                                                        //                   .id)
-                                                        //           .then(
-                                                        //               (value) {
-                                                        //         if (value[
-                                                        //                 'status'] !=
-                                                        //             true) {
-                                                        //           showAlertDialog(
-                                                        //               context,
-                                                        //               value[
-                                                        //                   'message']);
-                                                        //         } else {
-                                                        //           _controller
-                                                        //               .changeIsFollowState(
-                                                        //                   index);
-                                                        //         }
-                                                        //       });
-                                                        //     });
-                                                        //   },
-                                                        //   child: Visibility(
-                                                        //     visible:
-                                                        //         _controller
-                                                        //             .postData
-                                                        //             .value[
-                                                        //                 index]
-                                                        //             .user!
-                                                        //             .isFollow!,
-                                                        //     child: Container(
-                                                        //       width: 20.w,
-                                                        //       height: 20.h,
-                                                        //       decoration: const BoxDecoration(
-                                                        //           shape: BoxShape
-                                                        //               .circle,
-                                                        //           color: Colors
-                                                        //               .blue),
-                                                        //       child:
-                                                        //           const Center(
-                                                        //         child: Icon(
-                                                        //           Icons.add,
-                                                        //           color: Colors
-                                                        //               .white,
-                                                        //           size: 15,
-                                                        //         ),
-                                                        //       ),
-                                                        //     ),
-                                                        //   ),
-                                                        // ),
-                                                        child: Container(
-                                                          width: 20.w,
-                                                          height: 20.h,
-                                                          decoration:
-                                                              const BoxDecoration(
+                                                          Positioned(
+                                                            bottom: 0,
+                                                            left: 18.w,
+                                                            child: Container(
+                                                              width: 20.w,
+                                                              height: 20.h,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              decoration: const BoxDecoration(
                                                                   shape: BoxShape
                                                                       .circle,
                                                                   color: Colors
                                                                       .blue),
-                                                          child: Center(
-                                                            child: LikeButton(
-                                                              onTap: (bool
-                                                                  isFollowed) async {
-                                                                await checkLogin(
-                                                                    context,
-                                                                    () {
-                                                                  Controller()
-                                                                      .addFllow(
-                                                                          user_id: _controller
-                                                                              .postData
-                                                                              .value[index]
-                                                                              .user!
-                                                                              .id)
-                                                                      .then((value) {
-                                                                    if (value[
-                                                                            'status'] !=
-                                                                        true) {
-                                                                      showAlertDialog(
-                                                                          context,
-                                                                          value[
-                                                                              'message']);
-                                                                    } else {
-                                                                      _controller
-                                                                          .changeIsFollowState(
-                                                                              index);
-                                                                    }
-                                                                  });
-                                                                });
+                                                              child: Center(
+                                                                child:
+                                                                    LikeButton(
+                                                                  onTap: (bool
+                                                                      isFollowed) async {
+                                                                    await checkLogin(
+                                                                        context,
+                                                                        () {
+                                                                      Controller()
+                                                                          .addFllow(
+                                                                              user_id: _controller.postData.value[index].user!.id)
+                                                                          .then((value) {
+                                                                        if (value['status'] !=
+                                                                            true) {
+                                                                          showAlertDialog(
+                                                                              context,
+                                                                              value['message']);
+                                                                        } else {
+                                                                          _controller
+                                                                              .changeIsFollowState(index);
+                                                                        }
+                                                                      });
+                                                                    });
 
-                                                                return !isFollowed;
-                                                              },
-                                                              size: 17,
-                                                              circleColor: const CircleColor(
-                                                                  start: Color(
-                                                                      0xff00ddff),
-                                                                  end: Color(
-                                                                      0xff0099cc)),
-                                                              bubblesColor:
-                                                                  const BubblesColor(
-                                                                dotPrimaryColor:
-                                                                    Color(
-                                                                        0xff33b5e5),
-                                                                dotSecondaryColor:
-                                                                    Color(
-                                                                        0xff0099cc),
-                                                              ),
-                                                              likeBuilder: (bool
-                                                                  isFollowed) {
-                                                                return Icon(
-                                                                  isFollowed &&
-                                                                  _controller
-                                                                              .postData
-                                                                              .value[
-                                                                                  index]
-                                                                              .user!
-                                                                              .isFollow! ==
-                                                                          true
-                                                                      ? Icons
-                                                                          .done
-                                                                      : Icons
-                                                                          .add,
-                                                                  color: Colors
-                                                                      .white,
+                                                                    return !isFollowed;
+                                                                  },
                                                                   size: 15,
-                                                                );
-                                                              },
+                                                                  circleColor: const CircleColor(
+                                                                      start: Color(
+                                                                          0xff00ddff),
+                                                                      end: Color(
+                                                                          0xff0099cc)),
+                                                                  bubblesColor:
+                                                                      const BubblesColor(
+                                                                    dotPrimaryColor:
+                                                                        Color(
+                                                                            0xff33b5e5),
+                                                                    dotSecondaryColor:
+                                                                        Color(
+                                                                            0xff0099cc),
+                                                                  ),
+                                                                  likeBuilder: (bool
+                                                                      isFollowed) {
+                                                                    return Icon(
+                                                                      _controller.postData.value[index].user!.isFollow! ==
+                                                                              true
+                                                                          ? Icons
+                                                                              .done
+                                                                          : Icons
+                                                                              .add,
+                                                                      color: Colors
+                                                                          .white,
+                                                                      size: 15,
+                                                                    );
+                                                                  },
+                                                                ),
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
+                                                        ],
                                                       ),
-                                                    ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
-                                              SizedBox(height: 20.h),
-                                              Column(
-                                                children: [
-                                                  LikeButton(
-                                                    onTap:
-                                                        (bool isLiked) async {
-                                                      await checkLogin(context,
-                                                          () {
-                                                            
-                                                        Controller()
-                                                            .addLike(
-                                                                post_id:
-                                                                    _controller
+                                                  SizedBox(height: 20.h),
+                                                  Column(
+                                                    children: [
+                                                      LikeButton(
+                                                        onTap: (bool
+                                                            isLiked) async {
+                                                          await checkLogin(
+                                                              context, () {
+                                                            Controller()
+                                                                .addLike(
+                                                                    post_id: _controller
                                                                         .postData
                                                                         .value[
                                                                             index]
                                                                         .id)
-                                                            .then((value) {
-                                                          if (value['status'] !=
-                                                              true) {
-                                                            showAlertDialog(
-                                                                context,
-                                                                value[
-                                                                    'message']);
-                                                          } else {
-                                                            _controller
-                                                                .changeFavoriteState(
-                                                                    index);
-                                                          }
-                                                        });
-                                                      });
-
-                                                      return !isLiked;
-                                                    },
-                                                    countPostion:
-                                                        CountPostion.bottom,
-                                                    size: 30,
-                                                    circleColor:
-                                                        const CircleColor(
-                                                            start: Color(
-                                                                0xff00ddff),
-                                                            end: Color(
-                                                                0xff0099cc)),
-                                                    bubblesColor:
-                                                        const BubblesColor(
-                                                      dotPrimaryColor:
-                                                          Color(0xff33b5e5),
-                                                      dotSecondaryColor:
-                                                          Color(0xff0099cc),
-                                                    ),
-                                                    likeBuilder:
-                                                        (bool isLiked) {
-                                                      return Icon(
-                                                        Icons.favorite,
-                                                        color: isLiked &&
+                                                                .then((value) {
+                                                              if (value[
+                                                                      'status'] !=
+                                                                  true) {
+                                                                showAlertDialog(
+                                                                    context,
+                                                                    value[
+                                                                        'message']);
+                                                              } else {
                                                                 _controller
-                                                                        .postData
-                                                                        .value[
-                                                                            index]
-                                                                        .isFavorite ==
-                                                                    true
-                                                            ? Colors.red
-                                                            : Colors.grey,
+                                                                    .changeFavoriteState(
+                                                                        index);
+                                                              }
+                                                            });
+                                                          });
+
+                                                          return !isLiked;
+                                                        },
+                                                        countPostion:
+                                                            CountPostion.bottom,
                                                         size: 30,
+                                                        circleColor:
+                                                            const CircleColor(
+                                                                start: Color(
+                                                                    0xff00ddff),
+                                                                end: Color(
+                                                                    0xff0099cc)),
+                                                        bubblesColor:
+                                                            const BubblesColor(
+                                                          dotPrimaryColor:
+                                                              Color(0xff33b5e5),
+                                                          dotSecondaryColor:
+                                                              Color(0xff0099cc),
+                                                        ),
+                                                        likeBuilder:
+                                                            (bool isLiked) {
+                                                          return Icon(
+                                                            Icons.favorite,
+                                                            color: isLike &&
+                                                                    _controller
+                                                                            .postData
+                                                                            .value[index]
+                                                                            .isFavorite! 
+                                                                ? Colors.red
+                                                                : Colors.grey,
+                                                            size: 30,
+                                                          );
+                                                        },
+                                                        likeCount: int.parse(
+                                                            _controller
+                                                                .postData
+                                                                .value[index]
+                                                                .favoritesCount!),
+                                                        countBuilder:
+                                                            (int? count,
+                                                                bool isLiked,
+                                                                String text) {
+                                                          var color = isLiked
+                                                              ? Colors.red
+                                                              : Colors.grey;
+                                                          Widget result;
+                                                          // ignore: unrelated_type_equality_checks
+                                                          if (count == 0) {
+                                                            result = const Text(
+                                                              "Like",
+                                                              style: TextStyle(
+                                                                  fontSize: 10,
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                          } else {
+                                                            result = Text(
+                                                              text,
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      10.sp,
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                          }
+                                                          return result;
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 20.h),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                        isScrollControlled:
+                                                            true,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        context: context,
+                                                        builder: (context) =>
+                                                            CommentScreen(
+                                                                _controller
+                                                                    .postData
+                                                                    .value[
+                                                                        index]
+                                                                    .id,
+                                                                _controller
+                                                                    .postData
+                                                                    .value[
+                                                                        index]
+                                                                    .commentsCount),
                                                       );
-                                                    },
-                                                    likeCount: int.parse(
+                                                      setState(() {
                                                         _controller
                                                             .postData
                                                             .value[index]
-                                                            .favoritesCount!),
-                                                    countBuilder: (int? count,
-                                                        bool isLiked,
-                                                        String text) {
-                                                      var color = isLiked
-                                                          ? Colors.red
-                                                          : Colors.grey;
-                                                      Widget result;
-                                                      if (count == 0) {
-                                                        result = const Text(
-                                                          "Like",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
-                                                        );
-                                                      } else {
-                                                        result = Text(
-                                                          text,
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
-                                                        );
-                                                      }
-                                                      return result;
+                                                            .commentsCount;
+                                                      });
                                                     },
+                                                    child: Column(
+                                                      children: [
+                                                        Image.asset(
+                                                          'assets/images/messege.png',
+                                                          width: 40.h,
+                                                          height: 40.h,
+                                                          color:
+                                                              Colors.grey[400],
+                                                        ),
+                                                        Text(
+                                                          _controller
+                                                              .postData
+                                                              .value[index]
+                                                              .commentsCount
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                              fontSize: 10.sp,
+                                                              fontFamily:
+                                                                  'Poppins',
+                                                              color:
+                                                                  Colors.white),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 20.h),
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      final urlPreview =
+                                                          _controller
+                                                              .postData
+                                                              .value[index]
+                                                              .path;
+                                                      await Share.share(
+                                                          '$urlPreview');
+                                                    },
+                                                    child: Column(
+                                                      children: [
+                                                        Image.asset(
+                                                          'assets/images/share.png',
+                                                          width: 35.h,
+                                                          height: 35.h,
+                                                          color:
+                                                              Colors.grey[400],
+                                                        ),
+                                                        Text(
+                                                          '0',
+                                                          style: TextStyle(
+                                                              fontSize: 10.sp,
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ],
-                                              ),
-                                              SizedBox(height: 20.h),
-                                              InkWell(
-                                                onTap: () {
-                                                  showModalBottomSheet(
-                                                    isScrollControlled: true,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        CommentScreen(
-                                                            _controller
-                                                                .postData
-                                                                .value[index]
-                                                                .id,
-                                                            _controller
-                                                                .postData
-                                                                .value[index]
-                                                                .commentsCount),
-                                                  );
-                                                },
-                                                child: Column(
-                                                  children: [
-                                                    Image.asset(
-                                                      'assets/images/messege.png',
-                                                      width: 40.h,
-                                                      height: 40.h,
-                                                      color: Colors.grey[400],
-                                                    ),
-                                                    Text(
-                                                      _controller
-                                                          .postData
-                                                          .value[index]
-                                                          .commentsCount
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          fontSize: 10.sp,
-                                                          color: Colors.white),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              SizedBox(height: 20.h),
-                                              InkWell(
-                                                onTap: () async {
-                                                  final urlPreview = _controller
-                                                      .postData
-                                                      .value[index]
-                                                      .path;
-                                                  await Share.share(
-                                                      '$urlPreview');
-                                                },
-                                                child: Column(
-                                                  children: [
-                                                    Image.asset(
-                                                      'assets/images/share.png',
-                                                      width: 35.h,
-                                                      height: 35.h,
-                                                      color: Colors.grey[400],
-                                                    ),
-                                                    Text(
-                                                      '0',
-                                                      style: TextStyle(
-                                                          fontSize: 10.sp,
-                                                          color: Colors.white),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
+                                              )
                                             ],
-                                          )
-                                        ],
-                                      ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ],
-                          ),
-                        ],
-                      );
-                    });
-              }));
+                          );
+                        }),
+                  ),
+                ],
+              );
+            }),
+    );
   }
 
   showLoaderDialog(BuildContext context) {
@@ -649,12 +735,5 @@ class _HomePageState extends State<HomePage> {
         return alert;
       },
     );
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    // _controller.dispose();
-    super.dispose();
   }
 }

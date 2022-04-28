@@ -64,7 +64,7 @@ class _CongratsScreenState extends State<CongratsScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => NavScreen(),

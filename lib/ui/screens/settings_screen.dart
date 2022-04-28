@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:stream_master/api/stream_web_services.dart';
 
 import '../../helper/shared_prefrences_helper.dart';
 
@@ -190,10 +191,10 @@ class _EditProfileScreenState extends State<SettingsScreen> {
                   const SizedBox(width: 10),
                 ],
               ),
-              onTap: () {
-                SharedPrefrencesHelper.sharedPrefrencesHelper.setIsLogin(false);
-                SharedPrefrencesHelper.sharedPrefrencesHelper.logout(
-                    '${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}');
+              onTap: ()async {
+                await  Controller().logout();
+               
+              
                 Fluttertoast.showToast(msg: 'Logged out');
                 Navigator.pushReplacementNamed(context, '/Sign_in');
               },
