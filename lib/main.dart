@@ -1,4 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stream_master/ui/screens/auth/email_login.dart';
@@ -20,6 +23,10 @@ import 'ui/screens/out_bording/congrats_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPrefrencesHelper.sharedPrefrencesHelper.initSharedPrefrences();
+  await Firebase.initializeApp();
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true, badge: true, sound: true);
+  
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,

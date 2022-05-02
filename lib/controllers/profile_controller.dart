@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../models/profile.dart';
 
 class ProfileController extends GetxController{
-  Rx<Data> data = Data().obs;
+  Rx<UserData> data = UserData().obs;
 
   // static GeneralDataController _controller = GeneralDataController();
 

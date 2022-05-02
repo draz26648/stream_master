@@ -9,40 +9,44 @@ environment:
   sdk: ">=2.16.1 <3.0.0"
 
 dependencies:
+  cached_network_image: ^3.0.0
+  camera: ^0.9.4+20
+  cool_datepicker: null
+  cupertino_icons: ^1.0.2
+  firebase_auth: ^3.3.16
+  firebase_core: ^1.15.0
+  firebase_messaging: ^11.2.15
+  firebase_database: ^9.0.12
   flutter:
     sdk: flutter
-
-  cupertino_icons: ^1.0.2
+  flutter_app_minimizer: ^0.0.2
+  flutter_screenutil: ^5.3.1
+  flutter_svg: ^1.0.3
+  fluttertoast: ^8.0.9
+  font_awesome_flutter: ^10.0.0
   get: ^4.6.1
+  http: ^0.13.4
+  http_parser: ^4.0.0
   image_picker: ^0.8.4+8
+  intl: ^0.17.0
+  like_button: ^2.0.4
+  mime: ^1.0.1
+  path: null
+  path_provider: ^2.0.9
+  share_plus: ^4.0.3
+  shared_preferences: ^2.0.13
   video_compress: ^3.1.0
   video_player: ^2.2.18
-  shared_preferences: ^2.0.13
-  flutter_screenutil: ^5.3.1
-  font_awesome_flutter: ^10.0.0
-  flutter_app_minimizer: ^0.0.2
-  flutter_svg: ^1.0.3
-  share_plus: ^4.0.3
-  intl: ^0.17.0
-  cool_datepicker:
-  cached_network_image: ^3.0.0
-  wechat_camera_picker: ^2.4.2
   wechat_assets_picker: ^5.5.8
-  mime: ^1.0.1
-  http_parser: ^4.0.0
-  http: ^0.13.4
-  fluttertoast: ^8.0.9
-  like_button: ^2.0.4
-  path_provider: ^2.0.9
-  path:
-  camera: ^0.9.4+20
+  wechat_camera_picker: ^2.4.2
+  google_sign_in: ^5.3.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  flutter_launcher_icons_maker: ^0.10.2
 
   flutter_lints: ^1.0.0
-  flutter_launcher_icons_maker: ^0.10.2
+  flutter_test:
+    sdk: flutter
 
 flutter_icons:
   android: true

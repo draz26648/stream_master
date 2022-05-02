@@ -22,6 +22,7 @@ class CommentScreen extends StatefulWidget {
 
 class _CommentScreenState extends State<CommentScreen> {
   late List<Data2> fetchedComments = [];
+  late List<Data> fetchedPages = [];
 
   int _pages = 1;
   int _limit = 10;
@@ -58,7 +59,10 @@ class _CommentScreenState extends State<CommentScreen> {
           });
       await Controller().getCommentPages(widget.postId).then((value) => {
             setState(() {
-              _limit = value['last_page'];
+              value.forEach((e) {
+                fetchedPages.add(Data.fromJson(e));
+              });
+              _limit = fetchedPages[0].lastPage!;
             }),
           });
     } catch (e) {
@@ -161,7 +165,9 @@ class _CommentScreenState extends State<CommentScreen> {
                           ),
                           InkWell(
                             onTap: () {
-                              Navigator.pop(context,  );
+                              Navigator.pop(
+                                context,
+                              );
                             },
                             child: Image.asset('assets/images/close.png'),
                           ),
@@ -247,21 +253,16 @@ class _CommentScreenState extends State<CommentScreen> {
                         }),
                       ),
                     ),
-                    if (_isLoadMoreRunning == true)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 10, bottom: 40),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    if (_hasNextPage == false)
-                      Container(
-                        padding: const EdgeInsets.only(top: 30, bottom: 40),
-                        color: Colors.white,
-                        child: const Center(
-                          child: Text('You have fetched all of the content'),
-                        ),
-                      ),
+                    // if (_isLoadMoreRunning == true)
+                    //   Center(
+                    //     child: CircularProgressIndicator(),
+                    //   ),
+                    // if (_hasNextPage == false)
+                    //   Container(
+                    //     child: const Center(
+                    //       child: Text('You have fetched all of the content'),
+                    //     ),
+                    //   ),
                     Container(
                       padding: EdgeInsets.symmetric(
                           horizontal: 15.w, vertical: 10.h),
@@ -322,9 +323,7 @@ class _CommentScreenState extends State<CommentScreen> {
                                             post_id: widget.postId,
                                             description:
                                                 _commentController.text);
-                                        setState(() {
-                                          getComment();
-                                        });
+                                        getComment();
                                         _commentController.clear();
                                       });
                                     } else {

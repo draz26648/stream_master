@@ -3,25 +3,33 @@ import 'package:video_player/video_player.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final String videoUrl;
+  final bool? looping;
+  final bool? autoPlay;
+  final double? isMuted;
   
-  const VideoPlayerItem({Key? key, required this.videoUrl, }) : super(key: key);
+
+  const VideoPlayerItem({
+    Key? key,
+    required this.videoUrl, required this.looping, required this.autoPlay, required this.isMuted,
+  }) : super(key: key);
 
   @override
   _VideoPlayerItemState createState() => _VideoPlayerItemState();
 }
 
 class _VideoPlayerItemState extends State<VideoPlayerItem> {
-late  VideoPlayerController videoPlayerController;
+  late VideoPlayerController videoPlayerController;
   bool _isPlaying = false;
 
   @override
   void initState() {
-    videoPlayerController =  VideoPlayerController.network(widget.videoUrl)
+    videoPlayerController = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((value) {
         videoPlayerController.play();
         _isPlaying = true;
-        videoPlayerController.setVolume(1);
-        videoPlayerController.setLooping(true);
+        
+        videoPlayerController.setVolume(widget.isMuted!);
+        videoPlayerController.setLooping(widget.looping!);
         // videoPlayerController.pause();
       });
     super.initState();
@@ -55,7 +63,7 @@ late  VideoPlayerController videoPlayerController;
       color: Colors.black,
       child: InkWell(
           onTap: () => {videoCtrl()},
-          child: VideoPlayer(videoPlayerController)),
+          child: VideoPlayer(videoPlayerController,)),
     );
   }
 }

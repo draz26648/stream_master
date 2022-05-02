@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:stream_master/helper/shared_prefrences_helper.dart';
+import 'package:stream_master/models/Post.dart';
 import 'package:stream_master/ui/screens/settings_screen.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../api/stream_web_services.dart';
+import '../../controllers/general_controller.dart';
 import '../../controllers/profile_controller.dart';
 
 import '../../models/profile.dart';
+import '../widgets/video_player_item.dart';
 
 class ProfilePage extends StatefulWidget {
   final int? userId;
@@ -24,7 +27,8 @@ class ProfilePage extends StatefulWidget {
     this.canPop: false,
     this.onPop,
     required this.isSelfPage,
-    this.onSwitch, required this.userId,
+    this.onSwitch,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -32,21 +36,22 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // int? userId;
-  //
-  // late List<Data> fetchProfile = [];
   var data;
+  List<dynamic>? userVideos;
 
   late VideoPlayerController _controller;
 
   var isloading = false;
+  int? videoIndex;
+  final ProfileController _profileController = ProfileController.to;
+  final GeneralDataController _dataController = GeneralDataController.to;
 
   getProfile() async {
     setState(() {
       isloading = true;
     });
     try {
-      Controller().getProfile(widget.userId).then((value) => {
+      await Controller().getProfile(widget.userId).then((value) => {
             setState(() {
               isloading = false;
             }),
@@ -54,8 +59,8 @@ class _ProfilePageState extends State<ProfilePage> {
               {
                 setState(() {
                   data = value['data'];
+                  _profileController.data.value = UserData.fromJson(data);
                 }),
-                ProfileController.to.data.value = Data.fromJson(data),
                 print("the data is ${data}"),
               }
             else
@@ -69,13 +74,44 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  getUserVideos() async {
+    setState(() {
+      isloading = true;
+    });
+    try {
+      await Controller().getPost(0).then((element) {
+        if (element != null) {
+          print('profile videos is ${element}');
+          setState(() {
+            isloading = false;
+          });
+          setState(() {
+            userVideos = element;
+            for (var v in userVideos!) {
+              _dataController.postData.value.add(Data.fromJson(v));
+            }
+          });
+        }
+      });
+    } catch (e) {
+      print(e);
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     getProfile();
+    getUserVideos();
     super.initState();
     print("init called");
     _controller = VideoPlayerController.network(
-      '',
+      // videoUrl != null ?
+      _dataController.postData.value[0].path!
+      // : ''
+      ,
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
 
@@ -123,8 +159,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               borderRadius:
                                                   BorderRadius.circular(15.r),
                                               child: Image.network(
-                                                ProfileController
-                                                    .to.data.value.avatar!,
+                                                _profileController
+                                                    .data.value.avatar!,
                                               ),
                                             ),
                                             width: 60,
@@ -153,7 +189,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  data['name'],
+                                                  _profileController
+                                                      .data.value.name!,
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),
@@ -161,7 +198,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   height: 7.h,
                                                 ),
                                                 Text(
-                                                  '@${data['name']}',
+                                                  '@${_profileController.data.value.name!}',
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),
@@ -177,18 +214,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                             icon: Image.asset(
                                                 'assets/images/scan.png'),
                                           ),
-                                        widget.isSelfPage?  IconButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          SettingsScreen()));
-                                            },
-                                            icon: Image.asset(
-                                              'assets/images/setting.png',
-                                            ),
-                                          ) : Container(),
+                                          widget.isSelfPage
+                                              ? IconButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                SettingsScreen()));
+                                                  },
+                                                  icon: Image.asset(
+                                                    'assets/images/setting.png',
+                                                  ),
+                                                )
+                                              : Container(),
                                         ],
                                       ),
                                     ),
@@ -206,8 +245,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                             child: Column(
                                               children: [
                                                 Text(
-                                                  ProfileController.to.data
-                                                      .value.postsCount!,
+                                                  _profileController
+                                                      .data.value.postsCount!,
                                                   style: TextStyle(
                                                     fontSize: 14.sp,
                                                     fontWeight: FontWeight.w500,
@@ -240,7 +279,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               child: Column(
                                                 children: [
                                                   Text(
-                                                    data['followings_count'],
+                                                    _profileController.data
+                                                        .value.followersCount!,
                                                     style: TextStyle(
                                                         fontSize: 14.sp,
                                                         fontWeight:
@@ -271,7 +311,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                           Column(
                                             children: [
                                               Text(
-                                                data['followers_count'],
+                                                _profileController.data.value
+                                                    .followingsCount!,
                                                 style: TextStyle(
                                                     fontSize: 14.sp,
                                                     fontWeight: FontWeight.w500,
@@ -305,31 +346,34 @@ class _ProfilePageState extends State<ProfilePage> {
                                             color: Colors.white),
                                       ),
                                     ),
-                                  widget.isSelfPage? Container(
-                                      margin: EdgeInsets.all(10.w),
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        style: TextButton.styleFrom(
-                                          minimumSize: Size(0, 42.h),
-                                          backgroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15.r),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                              context, '/edit_profile_screen');
-                                        },
-                                        child: Text(
-                                          'Edit Profile',
-                                          style: TextStyle(
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ):Container(),
+                                    widget.isSelfPage
+                                        ? Container(
+                                            margin: EdgeInsets.all(10.w),
+                                            width: double.infinity,
+                                            child: ElevatedButton(
+                                              style: TextButton.styleFrom(
+                                                minimumSize: Size(0, 42.h),
+                                                backgroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15.r),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pushNamed(context,
+                                                    '/edit_profile_screen');
+                                              },
+                                              child: Text(
+                                                'Edit Profile',
+                                                style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
                                   ],
                                 ),
                               ),
@@ -338,14 +382,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.02,
                           ),
-                          /* SizedBox(
-                                height: 25,
-                              ),*/
                           Expanded(
                             child: Column(
                               children: [
                                 TabBar(
-                                  // indicatorColor: MyColors.appcolor,
                                   labelColor: Colors.black,
                                   unselectedLabelColor: Colors.grey,
                                   tabs: [
@@ -365,45 +405,27 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Expanded(
                                   child: TabBarView(
                                     children: [
-                                      data['posts_count'] != 0
+                                      _profileController
+                                                  .data.value.postsCount !=
+                                              0
                                           ? GridView.builder(
                                               gridDelegate:
                                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                                 crossAxisCount: 3,
+                                                crossAxisSpacing: .5,
+                                                mainAxisSpacing: 2,
                                               ),
-                                              // itemCount: model.videos!.length,
-                                              itemBuilder: (context, index) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  child: Container(
-                                                      child: _controller.value
-                                                              .isInitialized
-                                                          ? AspectRatio(
-                                                              aspectRatio:
-                                                                  _controller
-                                                                      .value
-                                                                      .aspectRatio,
-                                                              child: VideoPlayer(
-                                                                  _controller),
-                                                            )
-                                                          : Container(
-                                                              margin:
-                                                                  const EdgeInsets
-                                                                      .all(35),
-                                                              child:
-                                                                  const CircularProgressIndicator(
-                                                                strokeWidth: 2,
-                                                              ),
-                                                            ),
-                                                      height: 600.h,
-                                                      width: 113.w),
-                                                );
-                                              },
+                                              itemCount: int.parse(
+                                                  _profileController
+                                                      .data.value.postsCount!),
+                                              itemBuilder: (context, index) => buildPostItem( _dataController.postData.value[index].path!, context),
+                                              
                                             )
                                           : const Center(
                                               child: Text('there is no post')),
-                                      data['post_favorites_count'] == 0
+                                      _profileController.data.value
+                                                  .postFavoritesCount ==
+                                              0
                                           ? GridView.builder(
                                               gridDelegate:
                                                   const SliverGridDelegateWithFixedCrossAxisCount(
@@ -446,6 +468,38 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
         ));
   }
+  Widget buildPostItem(String? videoUrl, BuildContext ctx) => Card(
+        elevation: 0,
+        
+        child: Stack(children: [
+          Container(
+            height: 159,
+            width: 113,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(2.0),
+              child: VideoPlayerItem(
+                videoUrl: videoUrl!,
+                autoPlay: false,
+                looping: false,
+                isMuted: 0,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 10,
+            left: 10,
+            child: Container(
+              height: 20,
+              width: 20,
+              child: Icon(
+                Icons.play_circle,
+                color: Colors.white,
+                size: 15,
+              ),
+            ),
+          ),
+        ]),
+      );
 }
 
 class TextGroup extends StatelessWidget {
@@ -477,4 +531,6 @@ class TextGroup extends StatelessWidget {
       ),
     );
   }
+
+  
 }

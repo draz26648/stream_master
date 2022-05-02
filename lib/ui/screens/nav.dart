@@ -18,9 +18,11 @@ class _NavScreenState extends State<NavScreen> {
   int currentIndex = 0;
 
   onTap(index) {
-    setState(() {
-      currentIndex = index;
-    });
+    if (mounted) {
+      setState(() {
+        currentIndex = index;
+      });
+    }
   }
 
   List pages = [

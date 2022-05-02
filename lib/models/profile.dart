@@ -14,12 +14,12 @@ class ProfileModel {
 
     bool? status;
     String? message;
-    Data? data;
+    UserData? data;
 
     factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
         status: json["status"],
         message: json["message"],
-        data: Data.fromJson(json["data"]),
+        data: UserData.fromJson(json["data"]),
     );
 
     Map<String, dynamic> toJson() => {
@@ -29,8 +29,8 @@ class ProfileModel {
     };
 }
 
-class Data {
-    Data({
+class UserData {
+    UserData({
         this.id,
         this.name,
         this.email,
@@ -70,7 +70,7 @@ class Data {
     String? followingsCount;
     bool? isFollow;
 
-    factory Data.fromJson(Map<String, dynamic> json) => Data(
+    factory UserData.fromJson(Map<String, dynamic> json) => UserData(
         id: json["id"],
         name: json["name"],
         email: json["email"],

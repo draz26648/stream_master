@@ -83,12 +83,9 @@ class Controller {
         },
         body: mydata);
 
-    // print(" ${res.body}");
-
     final data = await json.decode(res.body);
-    loginmodel = LoginModel.fromJson(data);
+
     if (res.statusCode == 200) {
-      print('login model data is $loginmodel');
       print('fetched data is $data');
       return data;
     } else {
@@ -97,28 +94,27 @@ class Controller {
   }
 
   //logout web service
-  Future<dynamic> logout()async{
+  Future<dynamic> logout() async {
     var header;
-    String token = '${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}';
+    String token =
+        '${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}';
     header = <String, String>{
-        
-        'Authorization':
-            'Bearer $token',
-        'Accept': 'application/json'
-      };
-      var res = await http.post(Uri.parse("$apiurl/logout"),
-        headers: header,
-      );
-      final data = await json.decode(res.body);
-      if (res.statusCode == 200) {
-        print(data);
-        await SharedPrefrencesHelper.sharedPrefrencesHelper.setIsLogin(false);
-               await SharedPrefrencesHelper.sharedPrefrencesHelper.logout(
-                    token);
-        return data;
-      } else {
-        return data;
-      }
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json'
+    };
+    var res = await http.get(
+      Uri.parse("$apiurl/logout"),
+      headers: header,
+    );
+    final data = await json.decode(res.body);
+    if (res.statusCode == 200) {
+      print(data);
+      await SharedPrefrencesHelper.sharedPrefrencesHelper.setIsLogin(false);
+      await SharedPrefrencesHelper.sharedPrefrencesHelper.logout(token);
+      return data;
+    } else {
+      return data;
+    }
   }
 
 //home videos web service
@@ -139,7 +135,8 @@ class Controller {
       };
       print('you are in gust mode');
     }
-    var res = await http.get(Uri.parse("$apiurl/posts?page=$page"), headers: header);
+    var res =
+        await http.get(Uri.parse("$apiurl/posts?page=$page"), headers: header);
 
     final Map<String, dynamic> map = await json.decode(res.body);
     final Map<String, dynamic> data1 = map['data'];
@@ -174,7 +171,12 @@ class Controller {
 
     final Map<String, dynamic> map = await json.decode(res.body);
 
-    final List<dynamic> data = map['data'] as List;
+    final List<dynamic> data = [];
+    map.forEach((key, value) {
+      if (key == 'data') {
+        data.add(value);
+      }
+    });
     if (res.statusCode == 200) {
       print(data);
       return data;
@@ -195,18 +197,23 @@ class Controller {
     };
     var res =
         await http.get(Uri.parse("$apiurl/search?q=$query"), headers: header);
-    final Map<String, dynamic> map = await json.decode(res.body);
-    final List<dynamic> data = map['data']['posts'];
+    final Map<String,dynamic> jsonResponse = await json.decode(res.body);
+    final data = [
+      jsonResponse['data']['users'],
+      jsonResponse['data']['posts'],
+    ];
+
     if (res.statusCode == 200) {
-      print(data);
+      print('users Data is ${data[0]}');
+      print('posts Data is ${data[1]}');
       return data;
     } else {
-      return print(map['message']);
+      return print(jsonResponse['message']);
     }
   }
 
 // comments web service
-  Future<dynamic> getComment(postId,int? pageid) async {
+  Future<dynamic> getComment(postId, int? pageid) async {
     var res = await http.get(
       Uri.parse("$apiurl/comments?post_id=$postId&page=$pageid"),
       headers: <String, String>{
@@ -222,18 +229,20 @@ class Controller {
       return data;
     }
   }
-    Future<dynamic> getCommentPages(postId) async {
+
+  Future<dynamic> getCommentPages(postId) async {
     var res = await http.get(
       Uri.parse("$apiurl/comments?post_id=$postId"),
       headers: <String, String>{
         'Context-Type': 'application/json;charSet=UTF-8'
       },
     );
-    final Map<String, dynamic> map = await json.decode(res.body);
-    final List<dynamic> data = map['data'];
+    final Map<String, dynamic> jsonResonse = await json.decode(res.body);
+    final List<dynamic> data = jsonResonse['data'] as List;
+
     if (res.statusCode == 200) {
       print(data);
-      return data;
+      return data.map((e) => Data.fromJson(e)).toList();
     } else {
       return data;
     }

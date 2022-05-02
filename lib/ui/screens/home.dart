@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -73,7 +72,7 @@ class _HomePageState extends State<HomePage> {
           });
       Controller().getPostPages().then((value) => {
             setState(() {
-              maxPage = value['last_page'];
+              maxPage = int.parse(value['last_page']);
             }),
           });
     } catch (e) {
@@ -129,7 +128,6 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Expanded(
                     child: PageView.builder(
-                       
                         itemCount: _controller.postData.value.length,
                         controller: scrollController,
                         scrollDirection: Axis.vertical,
@@ -284,6 +282,9 @@ class _HomePageState extends State<HomePage> {
                                   // ignore: invalid_use_of_protected_member
                                   videoUrl:
                                       _controller.postData.value[index].path!,
+                                  autoPlay: true,
+                                  looping: true,
+                                  isMuted: 1,
                                 ),
                               ),
                               Column(
@@ -565,9 +566,10 @@ class _HomePageState extends State<HomePage> {
                                                             Icons.favorite,
                                                             color: isLike &&
                                                                     _controller
-                                                                            .postData
-                                                                            .value[index]
-                                                                            .isFavorite! 
+                                                                        .postData
+                                                                        .value[
+                                                                            index]
+                                                                        .isFavorite!
                                                                 ? Colors.red
                                                                 : Colors.grey,
                                                             size: 30,
@@ -589,7 +591,7 @@ class _HomePageState extends State<HomePage> {
                                                           // ignore: unrelated_type_equality_checks
                                                           if (count == 0) {
                                                             result = const Text(
-                                                              "Like",
+                                                              "0",
                                                               style: TextStyle(
                                                                   fontSize: 10,
                                                                   fontFamily:

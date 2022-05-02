@@ -33,12 +33,12 @@ class _EmailSignInState extends State<EmailSignIn> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _emailController.dispose();
+  //   _passwordController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +109,7 @@ class _EmailSignInState extends State<EmailSignIn> {
                           margin: EdgeInsets.only(
                               top: 10.h, left: 16.w, bottom: 10.h),
                           child: Text(
-                            'Email Address',
+                            'Email Address or Phone Number',
                             style: TextStyle(
                               color: color2,
                               fontFamily: 'poppins',
@@ -124,7 +124,7 @@ class _EmailSignInState extends State<EmailSignIn> {
                             controller: _emailController,
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return 'Please enter username or email';
+                                return 'Please enter username or email or phone number';
                               }
                               return null;
                             },
@@ -206,7 +206,7 @@ class _EmailSignInState extends State<EmailSignIn> {
                                 borderRadius: BorderRadius.circular(10.r),
                               ),
 
-                              // focusedBorder: border(borderColor: Colors.white)
+                              
                             ),
                           ),
                         ),
@@ -240,8 +240,7 @@ class _EmailSignInState extends State<EmailSignIn> {
                                       .setToken(value['data']['token']);
                                   Navigator.pushReplacementNamed(
                                       context, '/Nav_screen');
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop();
+                                  
                                 }
                               });
                             },

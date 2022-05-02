@@ -31,9 +31,7 @@ class _CreatVideoState extends State<CreatVideo> {
     final double scale = MediaQuery.of(context).devicePixelRatio;
     final AssetEntity? _entity = await CameraPicker.pickFromCamera(
       context,
-      
       theme: CameraPicker.themeData(color1),
-      
       enableRecording: true,
       onlyEnableRecording: true,
       maximumRecordingDuration: const Duration(seconds: 30),
@@ -121,7 +119,7 @@ class _CreatVideoState extends State<CreatVideo> {
     super.initState();
     print("init called");
 
-    _progressHUD = new ProgressHUD(
+    _progressHUD = ProgressHUD(
       backgroundColor: Colors.black12,
       color: Colors.white,
       containerColor: Colors.blue,
@@ -154,7 +152,7 @@ class _CreatVideoState extends State<CreatVideo> {
   @override
   Widget build(BuildContext context) {
     Widget rightButtons = Column(
-      children: <Widget>[
+      children: const [
         _CameraIconButton(
           icon: Icons.repeat,
           title: 'Flip',
