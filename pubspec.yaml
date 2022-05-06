@@ -40,6 +40,7 @@ dependencies:
   wechat_assets_picker: ^5.5.8
   wechat_camera_picker: ^2.4.2
   google_sign_in: ^5.3.0
+  video_thumbnail_imageview: ^0.0.5
 
 dev_dependencies:
   flutter_launcher_icons_maker: ^0.10.2

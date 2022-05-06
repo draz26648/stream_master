@@ -7,6 +7,7 @@ import 'package:stream_master/ui/screens/settings_screen.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:video_thumbnail_imageview/video_thumbnail_imageview.dart';
 
 import '../../api/stream_web_services.dart';
 import '../../controllers/general_controller.dart';
@@ -346,34 +347,45 @@ class _ProfilePageState extends State<ProfilePage> {
                                             color: Colors.white),
                                       ),
                                     ),
-                                    widget.isSelfPage
-                                        ? Container(
-                                            margin: EdgeInsets.all(10.w),
-                                            width: double.infinity,
-                                            child: ElevatedButton(
-                                              style: TextButton.styleFrom(
-                                                minimumSize: Size(0, 42.h),
-                                                backgroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15.r),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.pushNamed(context,
-                                                    '/edit_profile_screen');
-                                              },
-                                              child: Text(
+                                    Container(
+                                      margin: EdgeInsets.all(10.w),
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        style: TextButton.styleFrom(
+                                          minimumSize: Size(0, 42.h),
+                                          backgroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15.r),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pushNamed(
+                                              context, '/edit_profile_screen');
+                                        },
+                                        child: widget.isSelfPage
+                                            ? Text(
                                                 'Edit Profile',
                                                 style: TextStyle(
                                                     fontSize: 16.sp,
                                                     fontWeight: FontWeight.w500,
                                                     color: Colors.black),
+                                              )
+                                            : Text(
+                                                _dataController
+                                                        .postData
+                                                        .value[0]
+                                                        .user!
+                                                        .isFollow!
+                                                    ? 'Following'
+                                                    : 'Follow',
+                                                style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.black),
                                               ),
-                                            ),
-                                          )
-                                        : Container(),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -405,9 +417,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Expanded(
                                   child: TabBarView(
                                     children: [
-                                      _profileController
-                                                  .data.value.postsCount !=
-                                              0
+                                      userVideos != null
                                           ? GridView.builder(
                                               gridDelegate:
                                                   const SliverGridDelegateWithFixedCrossAxisCount(
@@ -418,37 +428,34 @@ class _ProfilePageState extends State<ProfilePage> {
                                               itemCount: int.parse(
                                                   _profileController
                                                       .data.value.postsCount!),
-                                              itemBuilder: (context, index) => buildPostItem( _dataController.postData.value[index].path!, context),
-                                              
+                                              itemBuilder: (context, index) =>
+                                                  buildPostItem(
+                                                      _dataController.postData
+                                                          .value[index].path!,
+                                                      context),
                                             )
                                           : const Center(
-                                              child: Text('there is no post')),
+                                              child: Text('there is no posts')),
                                       _profileController.data.value
                                                   .postFavoritesCount ==
                                               0
-                                          ? GridView.builder(
+                                          ? const Center(
+                                              child: Text(
+                                                  'This services not available at this time'),
+                                            )
+                                          : GridView.builder(
                                               gridDelegate:
                                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                                       crossAxisCount: 3,
                                                       mainAxisSpacing: 5,
-                                                      crossAxisSpacing: 5),
+                                                      crossAxisSpacing: 2),
                                               itemCount: 5,
                                               itemBuilder: (context, index) {
-                                                return Container(
-                                                  height: 600.h,
-                                                  width: 113.w,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                    color: Colors.grey.shade50,
-                                                  ),
-                                                );
+                                                return buildPostItem(
+                                                    _dataController.postData
+                                                        .value[index].path!,
+                                                    context);
                                               },
-                                            )
-                                          : const Center(
-                                              child: Text(
-                                                  'This services not available at this time'),
                                             ),
                                       const Center(
                                         child: Text(
@@ -468,20 +475,31 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
         ));
   }
+
   Widget buildPostItem(String? videoUrl, BuildContext ctx) => Card(
         elevation: 0,
-        
         child: Stack(children: [
           Container(
             height: 159,
             width: 113,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(2.0),
-              child: VideoPlayerItem(
+              child: VTImageView(
                 videoUrl: videoUrl!,
-                autoPlay: false,
-                looping: false,
-                isMuted: 0,
+                width: 76.09,
+                height: 109.0,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stack) {
+                  return Container(
+                    width: 76.09,
+                    height: 109.0,
+                    color: Colors.black,
+                    child: Center(
+                      child: Text("Image Loading Error"),
+                    ),
+                  );
+                },
+                assetPlaceHolder: 'asset/images/',
               ),
             ),
           ),
@@ -531,6 +549,4 @@ class TextGroup extends StatelessWidget {
       ),
     );
   }
-
-  
 }

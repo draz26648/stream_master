@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stream_master/ui/screens/auth/email_login.dart';
@@ -26,7 +26,7 @@ void main() async {
   await Firebase.initializeApp();
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true, badge: true, sound: true);
-  
+
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -51,23 +51,23 @@ class MyApp extends StatelessWidget {
           MediaQuery.of(context).size.height),
       builder: (context) {
         return MediaQuery(
-          data: MediaQueryData(),
+          data: const MediaQueryData(),
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             initialRoute: '/splash_screen',
             routes: {
-              '/splash_screen': (context) => SplashScreen(),
-              '/interests_screen': (context) => InterestsScreen(),
-              '/gender_screen': (context) => GenderScreen(),
-              '/go_watching': (context) => GoWatching(),
-              '/signUp_method': (context) => SignUpMethods(),
-              '/email_signUp': (context) => EmailSignUp(),
-              '/phone_signUp': (context) => PhoneSignUp(),
-              '/congrats_screen': (context) => CongratsScreen(),
-              '/birth_date': (context) => birthDate(),
-              '/Sign_in': (context) => EmailSignIn(),
-              '/Nav_screen': (context) => NavScreen(),
-              '/edit_profile_screen': (context) => EditProfileScreen(),
+              '/splash_screen': (context) => const SplashScreen(),
+              '/interests_screen': (context) => const InterestsScreen(),
+              '/gender_screen': (context) => const GenderScreen(),
+              '/go_watching': (context) => const GoWatching(),
+              '/signUp_method': (context) => const SignUpMethods(),
+              '/email_signUp': (context) => const EmailSignUp(),
+              '/phone_signUp': (context) => const PhoneSignUp(),
+              '/congrats_screen': (context) => const CongratsScreen(),
+              '/birth_date': (context) => const birthDate(),
+              '/Sign_in': (context) => const EmailSignIn(),
+              '/Nav_screen': (context) => const NavScreen(),
+              '/edit_profile_screen': (context) => const EditProfileScreen(),
             },
           ),
         );

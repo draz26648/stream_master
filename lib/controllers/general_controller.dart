@@ -10,6 +10,7 @@ class GeneralDataController extends GetxController{
   RxInt gender = 0.obs;
   RxString date = "".obs;
   RxList<Data> postData = RxList<Data>([]) ;
+  RxList<DataGeneral> postGeneral = RxList<DataGeneral>([]) ;
   File? videoPath ;
 
 

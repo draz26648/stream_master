@@ -6,6 +6,7 @@ import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:path/path.dart';
 import 'package:stream_master/api/stream_web_services.dart';
 import 'package:stream_master/ui/screens/profile_screen.dart';
+import 'package:video_thumbnail_imageview/video_thumbnail_imageview.dart';
 
 import '../../models/searchModel.dart';
 import '../widgets/video_player_item.dart';
@@ -243,12 +244,22 @@ class _DiscoverPageState extends State<DiscoverPage> {
             width: 77,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
-              child: VideoPlayerItem(
-                videoUrl: videoUrl!,
-                autoPlay: false,
-                looping: false,
-                isMuted: 0,
-              ),
+              child: VTImageView(
+                  videoUrl: videoUrl!,
+                  width: 76.09,
+                  height: 109.0,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stack) {
+                    return Container(
+                      width: 76.09,
+                      height: 109.0,
+                      
+                      color: Colors.black,
+                      child: Center(
+                        child: Text("Image Loading Error"),
+                      ),
+                    );
+                  }, assetPlaceHolder: 'asset/images/',),
             ),
           ),
           Positioned(

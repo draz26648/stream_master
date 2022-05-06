@@ -18,6 +18,7 @@ import '../../models/Post.dart';
 import '../../utils.dart';
 import '../widgets/video_player_item.dart';
 import '../screens/screens.dart';
+import 'main_widgets/app_loader.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -70,9 +71,13 @@ class _HomePageState extends State<HomePage> {
                 print('there is no data here'),
               }
           });
+          //get pages count
       Controller().getPostPages().then((value) => {
             setState(() {
-              maxPage = int.parse(value['last_page']);
+              value.forEach((element) {
+               _controller.postGeneral.value.add(DataGeneral.fromJson(element));
+              });
+              maxPage = _controller.postGeneral.value[0].lastPage!;
             }),
           });
     } catch (e) {
@@ -82,7 +87,7 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
-
+//inital pages loaded
   PageController scrollController =
       PageController(initialPage: 0, viewportFraction: 1);
 
@@ -90,6 +95,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     getPost();
     super.initState();
+    //page pagenation
     scrollController.addListener(() {
       setState(() {
         currentVideo = scrollController.page!.toInt();
@@ -109,7 +115,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Color color = Colors.white;
+  Color color = Colors.black;
   bool isLike = false;
 
   @override
@@ -119,8 +125,21 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.transparent,
       extendBody: true,
       body: isloading
-          ? const Center(
-              child: CircularProgressIndicator(),
+          ? 
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              decoration: const BoxDecoration(
+                color: Colors.black,
+                image: DecorationImage(
+                  image: AssetImage('assets/images/stack.png'),
+                  fit: BoxFit.cover,
+                ),
+              
+              ),
+              child: Center(
+                child: AppLoader(),
+              ),
             )
           : Obx(() {
               print("data length is  ${_controller.postData.value.length}");
@@ -724,9 +743,9 @@ class _HomePageState extends State<HomePage> {
     AlertDialog alert = AlertDialog(
       content: new Row(
         children: [
-          CircularProgressIndicator(),
-          Container(
-              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
+          AppLoader(
+            all: false,
+          ),
         ],
       ),
     );

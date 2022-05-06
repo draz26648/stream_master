@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 class AppLoader extends StatelessWidget {
   final bool all;
-
-  AppLoader({this.all = false});
+  final bool iscomment;
+  AppLoader({this.all = false, this.iscomment = false});
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +15,18 @@ class AppLoader extends StatelessWidget {
         color: Colors.white,
         child: Center(child: CupertinoActivityIndicator(radius: 22)),
       );
+    } else if (iscomment) {
+      return const Center(
+          child: CupertinoActivityIndicator(
+        radius: 15,
+        color: Colors.white,
+      ));
     } else {
-      return Center(child: CupertinoActivityIndicator(radius: 22));
+      return const Center(
+          child: CupertinoActivityIndicator(
+        radius: 22,
+        color: Colors.white,
+      ));
     }
   }
 }

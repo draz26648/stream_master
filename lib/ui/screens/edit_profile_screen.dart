@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../api/stream_web_services.dart';
@@ -77,6 +78,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(
+              height: 20,
+            ),
             Center(
               child: Container(
                 width: 120.w,
@@ -208,43 +212,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Container(
               margin: EdgeInsets.only(top: 10.h, left: 16.w),
               child: Text(
-                'email Adress',
-                style: TextStyle(
-                  color: color2,
-                  fontFamily: 'poppins',
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 16.w, right: 16.w),
-              child: TextField(
-                controller: _emailTextEditingController,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  hintStyle: TextStyle(fontFamily: 'Poppins'),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: color1,
-                    ),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: color1,
-                    ),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-
-                  // focusedBorder: border(borderColor: Colors.white)
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 10.h, left: 16.w),
-              child: Text(
                 'Bio',
                 style: TextStyle(
                   color: color2,
@@ -280,92 +247,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top: 10.h, left: 16.w),
-              child: Text(
-                'Mobile Number',
-                style: TextStyle(
-                  color: color2,
-                  fontFamily: 'poppins',
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 16.w, right: 16.w),
-              child: TextField(
-                controller: _mobileTextEditingController,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  hintStyle: TextStyle(fontFamily: 'Poppins'),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: color1,
-                    ),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: color1,
-                    ),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-
-                  // focusedBorder: border(borderColor: Colors.white)
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 10.h, left: 16.w),
-              child: Text(
-                'Password',
-                style: TextStyle(
-                  color: color2,
-                  fontFamily: 'poppins',
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 16.w, right: 16.w),
-              child: TextField(
-                obscureText: _isObscure,
-                controller: _passwordTextEditingController,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isObscure ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.black,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isObscure = !_isObscure;
-                      });
-                    },
-                  ),
-                  contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  hintStyle: TextStyle(fontFamily: 'Poppins'),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: color1,
-                    ),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: color1,
-                    ),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-
-                  // focusedBorder: border(borderColor: Colors.white)
-                ),
-              ),
-            ),
-            Container(
               margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
               width: 343.w,
               height: 48.h,
@@ -378,38 +259,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                 ),
                 onPressed: () {
-                  showLoaderDialog(context);
                   Controller()
-                      .editProfile(_image!,
-                          name: _nameTextEditingController.text,
-                          email: _emailTextEditingController.text,
-                          mobile: _mobileTextEditingController.text,
-                          description: _discraptionController!.text,
-                          password: _passwordTextEditingController.text)
+                      .editProfile(
+                    _image!,
+                    name: _nameTextEditingController.text,
+                    description: _discraptionController!.text,
+                  )
                       .then((value) {
                     if (value.containsKey("message")) {
-                      Navigator.of(context, rootNavigator: true).pop();
-                      showAlertDialog(context, value['message']);
-                      // var snackBar = SnackBar(content: Text(value['message']),);
-                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      Fluttertoast.showToast(
+                          msg: value["message"],);
                     } else {
-                      Navigator.of(context, rootNavigator: true).pop();
-                      var snackBar = SnackBar(
-                        content: Text(
-                          "profile update sucessfully",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                        backgroundColor: Colors.green,
-                        // margin: EdgeInsets.all(8),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      Fluttertoast.showToast(msg: 'Profile Updated');
                     }
                   });
-                  // Navigator.pushReplacementNamed(context, '/congrats_screen');
                 },
                 child: Text(
                   'save',

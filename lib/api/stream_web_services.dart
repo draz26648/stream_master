@@ -10,7 +10,7 @@ import 'package:stream_master/models/login_model.dart';
 import '../helper/shared_prefrences_helper.dart';
 
 class Controller {
-  dynamic apiurl = "https://stream.alkmal.com/api";
+  dynamic apiurl = "https://server.b-whatsapp.com/~alkmal/stream/public/api";
   bool isLoading = false;
 
 //register web service
@@ -197,7 +197,7 @@ class Controller {
     };
     var res =
         await http.get(Uri.parse("$apiurl/search?q=$query"), headers: header);
-    final Map<String,dynamic> jsonResponse = await json.decode(res.body);
+    final Map<String, dynamic> jsonResponse = await json.decode(res.body);
     final data = [
       jsonResponse['data']['users'],
       jsonResponse['data']['posts'],
@@ -380,8 +380,16 @@ class Controller {
 
   // edit profile web service
 
-  Future<dynamic> editProfile(File image,
-      {name, description, email, mobile, password}) async {
+  Future<dynamic> editProfile(
+    File image, {
+    name,
+    description,
+  }) async {
+     var header = <String, String>{
+      'Authorization':
+          'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
+      'Accept': 'application/json'
+    };
     var postUri = Uri.parse("$apiurl/profile");
     final mimeTypeData =
         lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
@@ -390,33 +398,23 @@ class Controller {
     final imageUploadRequest = http.MultipartRequest('POST', postUri);
     imageUploadRequest.fields['name'] = name;
     imageUploadRequest.fields['description'] = description;
-    imageUploadRequest.fields['mobile'] = mobile;
-    imageUploadRequest.fields['email'] = email;
-    imageUploadRequest.fields['password'] = password;
+    imageUploadRequest.headers.addAll(header);
     // Attach the file in the request
     final file = await http.MultipartFile.fromPath('image', image.path,
         contentType: MediaType(mimeTypeData![0], mimeTypeData[1]));
-    // Explicitly pass the extension of the image with request body
-    // Since image_picker has some bugs due which it mixes up
-    // image extension with file name like this filenamejpge
-    // Which creates some problem at the server side to manage
-    // or verify the file extension
-
-//    imageUploadRequest.fields['ext'] = mimeTypeData[1];
-
     imageUploadRequest.files.add(file);
+    
 
     try {
       final streamedResponse = await imageUploadRequest.send();
       final response = await http.Response.fromStream(streamedResponse);
       final data = await json.decode(response.body);
-      if (response.statusCode != 200) {
+      if (response.statusCode == 200) {
+        print(data);
         return data;
       } else {
         return data;
       }
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      return responseData;
     } catch (e) {
       print(e);
     }
