@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter/material.dart';
+import 'package:stream_master/ui/screens/video_screen.dart';
 
 import '../../api/stream_web_services.dart';
 
@@ -11,9 +12,12 @@ import '../../utils.dart';
 import '../widgets/constants.dart';
 
 class PostVideoScreen extends StatefulWidget {
-  final Uint8List? data;
+  final String? videoPath;
 
-  const PostVideoScreen({Key? key, this.data}) : super(key: key);
+  const PostVideoScreen({
+    Key? key,
+    required this.videoPath,
+  }) : super(key: key);
 
   @override
   _PostVideoScreen createState() => _PostVideoScreen();
@@ -22,6 +26,7 @@ class PostVideoScreen extends StatefulWidget {
 class _PostVideoScreen extends State<PostVideoScreen> {
   bool isSwitchedComment = false;
   bool isSwitchedDuet = false;
+  bool isSwitchedShare = false;
   var textValue = 'Switch is OFF';
   late TextEditingController _nameTextEditingController;
 
@@ -37,6 +42,7 @@ class _PostVideoScreen extends State<PostVideoScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        elevation: 0,
         title: Text(
           "Share new Clip",
           textAlign: TextAlign.center,
@@ -55,18 +61,16 @@ class _PostVideoScreen extends State<PostVideoScreen> {
               padding: EdgeInsets.only(top: 10),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  widget.data != null
-                      ? Image.memory(
-                          widget.data!,
-                          width: 150,
-                          height: 150,
-                        )
-                      : Image.asset(
-                          "assets/images/profile1.jpg",
-                          width: 150,
-                          height: 150,
-                        ),
+                children: [
+                  Container(
+                    width: 77.47,
+                    height: 109,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child:
+                        VideoPage(filePath: widget.videoPath!, isReview: false),
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _nameTextEditingController,
@@ -90,7 +94,7 @@ class _PostVideoScreen extends State<PostVideoScreen> {
               child: Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
+                  children: [
                     Container(
                       margin: EdgeInsets.only(left: 10.w),
                       child: Text(
@@ -103,7 +107,7 @@ class _PostVideoScreen extends State<PostVideoScreen> {
                       child: Transform.scale(
                         scale: 1.2,
                         child: Switch(
-                          onChanged: toggleduet,
+                          onChanged: toggleSwitch,
                           value: isSwitchedDuet,
                           activeColor: Colors.white,
                           activeTrackColor: Colors.green,
@@ -112,14 +116,13 @@ class _PostVideoScreen extends State<PostVideoScreen> {
                         ),
                       ),
                     ),
-                    
                   ]),
             ),
             Container(
               child: Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
+                  children: [
                     Container(
                         margin: const EdgeInsets.only(left: 10.0),
                         child: Text(
@@ -132,7 +135,7 @@ class _PostVideoScreen extends State<PostVideoScreen> {
                       child: Transform.scale(
                         scale: 1.2,
                         child: Switch(
-                          onChanged: toggleduet,
+                          onChanged: toggleSwitch2,
                           value: isSwitchedDuet,
                           activeColor: Colors.white,
                           activeTrackColor: Colors.green,
@@ -201,16 +204,12 @@ class _PostVideoScreen extends State<PostVideoScreen> {
                       print("ff ${value}");
                       Navigator.of(context, rootNavigator: true).pop();
                       showAlertDialog(context, value['message']);
-                      // var snackBar = SnackBar(content: Text(value['message']),);
-                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     } else {
-                      // _controller.changeIsFllowState(index);
-                      Navigator.of(context, rootNavigator: true).pop();
                       var snackBar = SnackBar(
-                        content: Text("upload sucessfully"),
+                        content: Text("File Upload Failed"),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      Navigator.pushReplacementNamed(context, "/Nav_screen");
+                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      // Navigator.pushReplacementNamed(context, "/Nav_screen");
                     }
                   });
                 },
@@ -252,6 +251,22 @@ class _PostVideoScreen extends State<PostVideoScreen> {
     } else {
       setState(() {
         isSwitchedDuet = false;
+        textValue = 'Switch Button is OFF';
+      });
+      print('Switch Button is OFF');
+    }
+  }
+
+  void toggleSwitch2(bool value) {
+    if (isSwitchedShare == false) {
+      setState(() {
+        isSwitchedShare = true;
+        textValue = 'Switch Button is ON';
+      });
+      print('Switch Button is ON');
+    } else {
+      setState(() {
+        isSwitchedShare = false;
         textValue = 'Switch Button is OFF';
       });
       print('Switch Button is OFF');

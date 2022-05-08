@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:overlay_support/overlay_support.dart';
+import 'package:stream_master/controllers/chat_controller.dart';
+import 'package:stream_master/controllers/message_controller.dart';
 import 'package:stream_master/ui/screens/auth/email_login.dart';
 import 'package:stream_master/ui/screens/auth/email_signup.dart';
 import 'package:stream_master/ui/screens/auth/phone_signup.dart';
@@ -42,6 +45,10 @@ class MyApp extends StatelessWidget {
       Get.put<GeneralDataController>(GeneralDataController());
   final ProfileController _controller1 =
       Get.put<ProfileController>(ProfileController());
+  final ChatController _chatController =
+      Get.put<ChatController>(ChatController());
+  final MessageController _messageController =
+      Get.put<MessageController>(MessageController());
 
   // This widget is the root of your application.
   @override
@@ -52,23 +59,25 @@ class MyApp extends StatelessWidget {
       builder: (context) {
         return MediaQuery(
           data: const MediaQueryData(),
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            initialRoute: '/splash_screen',
-            routes: {
-              '/splash_screen': (context) => const SplashScreen(),
-              '/interests_screen': (context) => const InterestsScreen(),
-              '/gender_screen': (context) => const GenderScreen(),
-              '/go_watching': (context) => const GoWatching(),
-              '/signUp_method': (context) => const SignUpMethods(),
-              '/email_signUp': (context) => const EmailSignUp(),
-              '/phone_signUp': (context) => const PhoneSignUp(),
-              '/congrats_screen': (context) => const CongratsScreen(),
-              '/birth_date': (context) => const birthDate(),
-              '/Sign_in': (context) => const EmailSignIn(),
-              '/Nav_screen': (context) => const NavScreen(),
-              '/edit_profile_screen': (context) => const EditProfileScreen(),
-            },
+          child: OverlaySupport.global(
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              initialRoute: '/splash_screen',
+              routes: {
+                '/splash_screen': (context) => const SplashScreen(),
+                '/interests_screen': (context) => const InterestsScreen(),
+                '/gender_screen': (context) => const GenderScreen(),
+                '/go_watching': (context) => const GoWatching(),
+                '/signUp_method': (context) => const SignUpMethods(),
+                '/email_signUp': (context) => const EmailSignUp(),
+                '/phone_signUp': (context) => const PhoneSignUp(),
+                '/congrats_screen': (context) => const CongratsScreen(),
+                '/birth_date': (context) => const birthDate(),
+                '/Sign_in': (context) => const EmailSignIn(),
+                '/Nav_screen': (context) => const NavScreen(),
+                '/edit_profile_screen': (context) => const EditProfileScreen(),
+              },
+            ),
           ),
         );
       },

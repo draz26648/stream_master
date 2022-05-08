@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:async/async.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
+import 'package:path/path.dart';
 import 'package:stream_master/models/comments_model.dart';
 import 'package:stream_master/models/login_model.dart';
 
 import '../helper/shared_prefrences_helper.dart';
 
 class Controller {
-  dynamic apiurl = "https://server.b-whatsapp.com/~alkmal/stream/public/api";
+  dynamic apiurl = "https://stream.alkmal.com/api";
   bool isLoading = false;
 
 //register web service
@@ -381,42 +382,162 @@ class Controller {
   // edit profile web service
 
   Future<dynamic> editProfile(
-    File image, {
-    name,
-    description,
-  }) async {
-     var header = <String, String>{
+    String? name,
+    String? description,
+  ) async {
+    var sendData = {
+      "name": '$name',
+      "description": '$description',
+    };
+    var res = await http.post(Uri.parse("$apiurl/profile"),
+        headers: <String, String>{
+          'Context-Type': 'application/json;charSet=UTF-8',
+          'Authorization':
+              'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
+          'Accept': 'application/json'
+        },
+        body: sendData);
+    print(" ${res}");
+    final data = await json.decode(res.body);
+    if (res.statusCode == 200) {
+      print(data);
+      return data;
+    } else {
+      return data;
+    }
+  }
+
+  Future<dynamic> uploadProfilePic(File imageFile) async {
+    // open a bytestream
+    var header = <String, String>{
+      'Context-Type': 'application/json;charSet=UTF-8',
       'Authorization':
           'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
       'Accept': 'application/json'
     };
-    var postUri = Uri.parse("$apiurl/profile");
+    var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    // get file length
+    var length = await imageFile.length();
     final mimeTypeData =
-        lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
+        lookupMimeType(imageFile.path, headerBytes: [0xFF, 0xD8])?.split('/');
 
-    // Intilize the multipart request
-    final imageUploadRequest = http.MultipartRequest('POST', postUri);
-    imageUploadRequest.fields['name'] = name;
-    imageUploadRequest.fields['description'] = description;
-    imageUploadRequest.headers.addAll(header);
-    // Attach the file in the request
-    final file = await http.MultipartFile.fromPath('image', image.path,
-        contentType: MediaType(mimeTypeData![0], mimeTypeData[1]));
-    imageUploadRequest.files.add(file);
-    
+    // string to uri
+    var uri = Uri.parse("$apiurl/profile");
 
-    try {
-      final streamedResponse = await imageUploadRequest.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      final data = await json.decode(response.body);
-      if (response.statusCode == 200) {
-        print(data);
-        return data;
-      } else {
-        return data;
-      }
-    } catch (e) {
-      print(e);
+    // create multipart request
+    var request = http.MultipartRequest("POST", uri);
+
+    // multipart that takes file
+    var multipartFile = http.MultipartFile(
+      'file',
+      stream,
+      length,
+      filename: basename(imageFile.path),
+      contentType: MediaType(mimeTypeData![0], mimeTypeData[1]),
+    );
+
+    // add file to multipart
+    request.files.add(multipartFile);
+    request.headers.addAll(header);
+
+    // send
+    var response = await request.send();
+    print(response.statusCode);
+
+    // listen for response
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+  }
+
+  // get all chats
+
+  Future<dynamic> getChats() async {
+    var res = await http.get(
+      Uri.parse("$apiurl/chats"),
+      headers: <String, String>{
+        'Context-Type': 'application/json;charSet=UTF-8',
+        'Authorization':
+            'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
+        'Accept': 'application/json'
+      },
+    );
+    final map = await json.decode(res.body);
+    final data = map['data']['data'];
+    if (res.statusCode == 200) {
+      print(data);
+      return data;
+    } else {
+      throw Exception('Failed to load internet');
+    }
+  }
+
+  // create new chat
+
+  Future<dynamic> createChat({user_id}) async {
+    var mydata = {
+      "user_id": '$user_id',
+    };
+    var res = await http.post(Uri.parse("$apiurl/chats"),
+        headers: <String, String>{
+          'Context-Type': 'application/json;charSet=UTF-8',
+          'Authorization':
+              'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
+          'Accept': 'application/json'
+        },
+        body: mydata);
+
+    final map = await json.decode(res.body);
+    final data = map['data'];
+    if (res.statusCode == 200) {
+      print(data);
+      return data;
+    } else {
+      throw Exception('Failed to load internet');
+    }
+  }
+
+  // get chat messages
+   Future getChatMessages({chat_id, user_id}) async {
+    http.Response res = await http.get(
+      Uri.parse("$apiurl/messages?chat_id=$chat_id&user_id=$user_id"),
+      headers: <String, String>{
+        'Context-Type': 'application/json;charSet=UTF-8',
+        'Authorization':
+            'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
+        'Accept': 'application/json'
+      },
+    );
+    final map = await json.decode(res.body);
+    final data = map['data']['data'];
+    if (res.statusCode == 200) {
+      print(data);
+      return data;
+    } else {
+      throw Exception('Failed to load internet');
+    }
+  }
+
+  // send message
+  Future<dynamic> sendMessage({chat_id, message}) async {
+    var mydata = {
+      "chat_id": '$chat_id',
+      "message": '$message',
+    };
+    var res = await http.post(Uri.parse("$apiurl/messages"),
+        headers: <String, String>{
+          'Context-Type': 'application/json;charSet=UTF-8',
+          'Authorization':
+              'Bearer ${SharedPrefrencesHelper.sharedPrefrencesHelper.getToken()}',
+          'Accept': 'application/json'
+        },
+        body: mydata);
+    var data = await json.decode(res.body);
+    if (res.statusCode == 200) {
+      print(data);
+      return data;
+    } else {
+      throw Exception('Failed to load internet');
     }
   }
 

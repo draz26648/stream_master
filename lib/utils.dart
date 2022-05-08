@@ -21,9 +21,10 @@ pickImage(ImageSource source) async {
   return profilePhoto;
 }
 
-checkLogin(context, doTask) {
+checkLogin(context, doTask ) async {
   if (SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin() != null &&
       SharedPrefrencesHelper.sharedPrefrencesHelper.getLogin()!) {
+
     doTask();
     return true;
   } else {

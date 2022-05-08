@@ -4,7 +4,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:stream_master/api/stream_web_services.dart';
+import 'package:stream_master/ui/screens/main_widgets/app_loader.dart';
 import 'package:stream_master/ui/screens/profile_screen.dart';
 import 'package:video_thumbnail_imageview/video_thumbnail_imageview.dart';
 
@@ -70,7 +72,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        toolbarHeight: 20.h,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -90,29 +91,41 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   width: 343.w,
                   height: 48.h,
                   padding: EdgeInsets.all(16.w),
-                  child: TextFormField(
-                    controller: _searchController,
-                    onFieldSubmitted: (_) {
-                      getResult();
-                    },
-                    decoration: InputDecoration(
-                      focusColor: Colors.black,
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: EdgeInsets.only(left: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                  child: Row(
+                    children: [
+                      isloading
+                          ? AppLoader(
+                              iscomment: true,
+                            )
+                          : Image(
+                              image: AssetImage('assets/images/search.png'),
+                              height: 24.h,
+                              width: 24.w,
+                            ),
+                      SizedBox(width: 16.w),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _searchController,
+                          onFieldSubmitted: (_) {
+                            getResult();
+                          },
+                          decoration: InputDecoration(
+                            focusColor: Colors.black,
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: EdgeInsets.only(left: 10),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            hintText: 'Search',
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                              fontSize: ScreenUtil().setSp(16),
+                            ),
+                          ),
+                        ),
                       ),
-                      hintText: 'Search',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontSize: ScreenUtil().setSp(16),
-                      ),
-                      prefixIcon: const ImageIcon(
-                        AssetImage('assets/images/search.png'),
-                        size: 15,
-                      ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -124,15 +137,17 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '#Users',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    isloading
+                        ? AppLoader()
+                        : const Text(
+                            '#Users',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -165,15 +180,17 @@ class _DiscoverPageState extends State<DiscoverPage> {
                     const SizedBox(
                       height: 15,
                     ),
-                    const Text(
-                      '#Posts',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    isloading
+                        ? AppLoader()
+                        : const Text(
+                            '#Posts',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -233,48 +250,51 @@ class _DiscoverPageState extends State<DiscoverPage> {
         ),
       );
 
-  Widget buildPostItem(String? videoUrl, BuildContext ctx) => Card(
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Stack(children: [
-          Container(
-            height: 200,
-            width: 77,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15.0),
-              child: VTImageView(
-                  videoUrl: videoUrl!,
+  Widget buildPostItem(String? videoUrl, BuildContext ctx) {
+    return Card(
+      elevation: 4.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Stack(children: [
+        Container(
+          height: 200,
+          width: 77,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15.0),
+            child: VTImageView(
+              videoUrl: videoUrl!,
+              width: 76.09,
+              height: 109.0,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stack) {
+                return Container(
                   width: 76.09,
                   height: 109.0,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stack) {
-                    return Container(
-                      width: 76.09,
-                      height: 109.0,
-                      
-                      color: Colors.black,
-                      child: Center(
-                        child: Text("Image Loading Error"),
-                      ),
-                    );
-                  }, assetPlaceHolder: 'asset/images/',),
+                  color: Colors.black,
+                  child: Center(
+                    child: Text("Image Loading Error"),
+                  ),
+                );
+              },
+              assetPlaceHolder: '',
             ),
           ),
-          Positioned(
-            bottom: 10,
-            left: 10,
-            child: Container(
-              height: 20,
-              width: 20,
-              child: Icon(
-                Icons.play_circle,
-                color: Colors.white,
-                size: 15,
-              ),
+        ),
+        Positioned(
+          bottom: 10,
+          left: 10,
+          child: Container(
+            height: 20,
+            width: 20,
+            child: Icon(
+              Icons.play_circle,
+              color: Colors.white,
+              size: 15,
             ),
           ),
-        ]),
-      );
+        ),
+      ]),
+    );
+  }
 }

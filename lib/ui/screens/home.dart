@@ -71,11 +71,12 @@ class _HomePageState extends State<HomePage> {
                 print('there is no data here'),
               }
           });
-          //get pages count
+      //get pages count
       Controller().getPostPages().then((value) => {
             setState(() {
               value.forEach((element) {
-               _controller.postGeneral.value.add(DataGeneral.fromJson(element));
+                _controller.postGeneral.value
+                    .add(DataGeneral.fromJson(element));
               });
               maxPage = _controller.postGeneral.value[0].lastPage!;
             }),
@@ -87,6 +88,44 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
+  getNextPost() async {
+    try {
+      Controller().getPost(currentPage).then((value) => {
+            if (value != null)
+              {
+                setState(() {
+                  data = value;
+
+                  data.forEach((element) {
+                    // ignore: invalid_use_of_protected_member
+                    _controller.postData.value.add(Data.fromJson(element));
+                  });
+                }),
+                print(
+                    // ignore: invalid_use_of_protected_member
+                    "the data is ${_controller.postData.value[0].toString()}"),
+              }
+            else
+              {
+                print('there is no data here'),
+              }
+          });
+      //get pages count
+      Controller().getPostPages().then((value) => {
+            setState(() {
+              value.forEach((element) {
+                _controller.postGeneral.value
+                    .add(DataGeneral.fromJson(element));
+              });
+              maxPage = _controller.postGeneral.value[0].lastPage!;
+            }),
+          });
+    } catch (e) {
+      print(e);
+    }
+  }
+
 //inital pages loaded
   PageController scrollController =
       PageController(initialPage: 0, viewportFraction: 1);
@@ -101,9 +140,9 @@ class _HomePageState extends State<HomePage> {
         currentVideo = scrollController.page!.toInt();
       });
       if (currentVideo >= 5 && currentPage < maxPage) {
-        setState(() {
+        setState(() async {
           currentPage++;
-          getPost();
+          await getNextPost();
         });
       }
     });
@@ -125,8 +164,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.transparent,
       extendBody: true,
       body: isloading
-          ? 
-            Container(
+          ? Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               decoration: const BoxDecoration(
@@ -135,7 +173,6 @@ class _HomePageState extends State<HomePage> {
                   image: AssetImage('assets/images/stack.png'),
                   fit: BoxFit.cover,
                 ),
-              
               ),
               child: Center(
                 child: AppLoader(),
@@ -636,59 +673,63 @@ class _HomePageState extends State<HomePage> {
                                                     ],
                                                   ),
                                                   SizedBox(height: 20.h),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      showModalBottomSheet(
-                                                        isScrollControlled:
-                                                            true,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            CommentScreen(
-                                                                _controller
-                                                                    .postData
-                                                                    .value[
-                                                                        index]
-                                                                    .id,
-                                                                _controller
-                                                                    .postData
-                                                                    .value[
-                                                                        index]
-                                                                    .commentsCount),
-                                                      );
-                                                      setState(() {
-                                                        _controller
-                                                            .postData
-                                                            .value[index]
-                                                            .commentsCount;
-                                                      });
-                                                    },
-                                                    child: Column(
-                                                      children: [
-                                                        Image.asset(
-                                                          'assets/images/messege.png',
-                                                          width: 40.h,
-                                                          height: 40.h,
-                                                          color:
-                                                              Colors.grey[400],
-                                                        ),
-                                                        Text(
+                                                  FutureBuilder(builder:
+                                                      (context, snapshot) {
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        showModalBottomSheet(
+                                                          isScrollControlled:
+                                                              true,
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              CommentScreen(
+                                                                  _controller
+                                                                      .postData
+                                                                      .value[
+                                                                          index]
+                                                                      .id,
+                                                                  _controller
+                                                                      .postData
+                                                                      .value[
+                                                                          index]
+                                                                      .commentsCount),
+                                                        );
+                                                        setState(() {
                                                           _controller
                                                               .postData
                                                               .value[index]
-                                                              .commentsCount
-                                                              .toString(),
-                                                          style: TextStyle(
-                                                              fontSize: 10.sp,
-                                                              fontFamily:
-                                                                  'Poppins',
-                                                              color:
-                                                                  Colors.white),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
+                                                              .commentsCount;
+                                                        });
+                                                      },
+                                                      child: Column(
+                                                        children: [
+                                                          Image.asset(
+                                                            'assets/images/messege.png',
+                                                            width: 40.h,
+                                                            height: 40.h,
+                                                            color: Colors
+                                                                .grey[400],
+                                                          ),
+                                                          Text(
+                                                            _controller
+                                                                .postData
+                                                                .value[index]
+                                                                .commentsCount
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                fontSize: 10.sp,
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                color: Colors
+                                                                    .white),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    );
+                                                  }),
                                                   SizedBox(height: 20.h),
                                                   InkWell(
                                                     onTap: () async {

@@ -28,12 +28,14 @@ class _CommentScreenState extends State<CommentScreen> {
 
   int _pages = 1;
   int _limit = 10;
+  int totalComments = 0;
   bool _hasNextPage = true;
   bool _isFirstLoadRunning = false;
   bool _isLoadMoreRunning = false;
 
   bool isloading = false;
   bool iscomment = false;
+  
   String? profilePic;
   void getComment() async {
     setState(() {
@@ -66,6 +68,7 @@ class _CommentScreenState extends State<CommentScreen> {
                 fetchedPages.add(Data.fromJson(e));
               });
               _limit = fetchedPages[0].lastPage!;
+              totalComments = fetchedPages[0].total!;
             }),
           });
     } catch (e) {
@@ -182,7 +185,7 @@ class _CommentScreenState extends State<CommentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Comments ${widget.commentCount}',
+                      'Comments ${totalComments}',
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'poppins',
@@ -284,10 +287,10 @@ class _CommentScreenState extends State<CommentScreen> {
                               );
                             }),
                           ),
-                          if (_isLoadMoreRunning == true)
-                            Center(
-                              child: AppLoader(),
-                            ),
+                          // if (_isLoadMoreRunning == true)
+                          //   Center(
+                          //     child: AppLoader(),
+                          //   ),
                         ],
                       ),
               ),
@@ -309,39 +312,43 @@ class _CommentScreenState extends State<CommentScreen> {
                           SizedBox(
                             width: 10.w,
                           ),
-                          Container(
-                            width: 264.w,
-                            child: TextFormField(
-                              controller: _commentController,
-                              style: TextStyle(),
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 10.h, horizontal: 20.w),
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: 'Add Comment',
-                                hintStyle: TextStyle(
-                                    color: color1, fontFamily: 'poppins'),
-                                labelStyle: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.r),
-                                  borderSide: BorderSide(color: Colors.grey),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.r),
-                                  borderSide: BorderSide(color: Colors.white),
+                          Expanded(
+                            child: Container(
+                              width: 264.w,
+                              child: TextFormField(
+                                controller: _commentController,
+                                style: TextStyle(),
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 10.h, horizontal: 20.w),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  hintText: 'Add Comment',
+                                  hintStyle: TextStyle(
+                                      color: color1, fontFamily: 'poppins'),
+                                  labelStyle: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.r),
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.r),
+                                    borderSide: BorderSide(color: Colors.white),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                           isloading || iscomment
-                              ? Expanded(
-                                  child: AppLoader(
-                                    iscomment: true,
-                                  ),
-                                )
+                              ? Container(
+                                width: 50,
+                                height: 50,
+                                child: AppLoader(
+                                  iscomment: true,
+                                ),
+                              )
                               : IconButton(
                                   onPressed: () {
                                     if (_commentController.text.isNotEmpty) {
@@ -349,46 +356,21 @@ class _CommentScreenState extends State<CommentScreen> {
                                         postComment(_commentController.text);
                                         _commentController.clear();
                                       });
+                                      getComment();
                                     } else if (_commentController
                                         .text.isEmpty) {
                                       Fluttertoast.showToast(
                                           msg: 'Please enter comment');
                                     }
-                                    getComment();
+                                    
                                   },
                                   icon: Image.asset(
-                                    'assets/images/sendss.png',
-                                    width: 50.w,
-                                    height: 50.h,
+                                    'assets/images/sent.png',
+                                    width: 50,
+                                    height: 50,
                                   ),
                                 ),
-                          // Expanded(
-                          //   child: MaterialButton(
-                          //     onPressed: () {
-                          //       if (_commentController.text.isNotEmpty) {
-                          //         checkLogin(context, (){
-                          //           postComment(_commentController.text);
-                          //           _commentController.clear();
-                          //         });
-                          //       } else if(_commentController.text.isEmpty) {
-                          //         Fluttertoast.showToast(msg: 'Please enter comment');
-                          //       }
-                          //     },
-                          //     child:
-                          // isloading || iscomment
-                          //         ? AppLoader(
-                          //             iscomment: true,
-                          //           )
-                          //         : Image.asset(
-                          //             'assets/images/sendss.png',
-                          //             width: 50.w,
-                          //             height: 50.h,
-                          //           ),
-                          //     shape: RoundedRectangleBorder(
-                          //       borderRadius: BorderRadius.circular(15.r),
-                          //     ),
-                          //   ),
-                          // ),
+                     
                         ],
                       )
                     : const Center(

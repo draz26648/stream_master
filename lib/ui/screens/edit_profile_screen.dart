@@ -45,6 +45,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _passwordTextEditingController = TextEditingController();
     _passwordTextEditingController.text = "";
     _discraptionController = TextEditingController();
+    _discraptionController!.text = _controller.data.value.description!;
     // _discraptionController.text = _controller.data.value.description != null
     //     ? _controller.data.value.description!
     //     : 'type some thing about you';
@@ -99,12 +100,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ? FileImage(_image!)
                             : NetworkImage(_controller.data.value.avatar!)
                                 as ImageProvider,
-                        // child: Image.network(
-                        //   _controller.data.value.avatar!,
-                        //   fit: BoxFit.fill,
-                        //   width: 110.w,
-                        //   height: 110.h,
-                        // ),
                       ),
                     ),
                     Positioned(
@@ -248,7 +243,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
-              width: 343.w,
+              width: MediaQuery.of(context).size.width,
               height: 48.h,
               child: ElevatedButton(
                 style: TextButton.styleFrom(
@@ -261,18 +256,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 onPressed: () {
                   Controller()
                       .editProfile(
-                    _image!,
-                    name: _nameTextEditingController.text,
-                    description: _discraptionController!.text,
+                    _nameTextEditingController.text,
+                    _discraptionController!.text,
                   )
                       .then((value) {
                     if (value.containsKey("message")) {
                       Fluttertoast.showToast(
-                          msg: value["message"],);
+                        msg: value["message"],
+                      );
                     } else {
                       Fluttertoast.showToast(msg: 'Profile Updated');
                     }
                   });
+                  if (_image != null) {
+                    Controller().uploadProfilePic(_image!);
+                  }
                 },
                 child: Text(
                   'save',

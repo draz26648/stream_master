@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:stream_master/helper/shared_prefrences_helper.dart';
 import 'package:stream_master/models/Post.dart';
+import 'package:stream_master/ui/screens/qr_screen.dart';
 import 'package:stream_master/ui/screens/settings_screen.dart';
 import 'package:video_player/video_player.dart';
 
@@ -15,6 +16,8 @@ import '../../controllers/profile_controller.dart';
 
 import '../../models/profile.dart';
 import '../widgets/video_player_item.dart';
+import 'chat/chat_screen.dart';
+import 'main_widgets/app_loader.dart';
 
 class ProfilePage extends StatefulWidget {
   final int? userId;
@@ -43,9 +46,18 @@ class _ProfilePageState extends State<ProfilePage> {
   late VideoPlayerController _controller;
 
   var isloading = false;
+
   int? videoIndex;
   final ProfileController _profileController = ProfileController.to;
   final GeneralDataController _dataController = GeneralDataController.to;
+  int currentIndex = 0;
+  onTap(index) {
+    if (mounted) {
+      setState(() {
+        currentIndex = index;
+      });
+    }
+  }
 
   getProfile() async {
     setState(() {
@@ -102,6 +114,25 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  int? chatId;
+  createChat() async {
+    try {
+      await Controller()
+          .createChat(
+        user_id: widget.userId,
+      )
+          .then((value) {
+        if (value != null) {
+          setState(() {
+            chatId = value['id'];
+          });
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void initState() {
     getProfile();
@@ -132,8 +163,19 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           body: SharedPrefrencesHelper.sharedPrefrencesHelper.getToken() != null
               ? isloading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
+                  ? Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      decoration: const BoxDecoration(
+                        color: Colors.black,
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/stack.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Center(
+                        child: AppLoader(),
+                      ),
                     )
                   : Obx(() {
                       return Column(
@@ -206,11 +248,39 @@ class _ProfilePageState extends State<ProfilePage> {
                                               ],
                                             ),
                                           ),
+                                          widget.isSelfPage
+                                              ? Container()
+                                              : IconButton(
+                                                  onPressed: () async{
+                                                  await  createChat();
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                ChatScreen(
+                                                                  chatId:
+                                                                      chatId!,
+                                                                  userId: widget
+                                                                      .userId!,
+                                                                )));
+                                                  },
+                                                  icon: const ImageIcon(
+                                                    AssetImage(
+                                                        'assets/images/chat.png'),
+                                                    color: Colors.white,
+                                                  )),
                                           IconButton(
                                             onPressed: () {
-                                              Fluttertoast.showToast(
-                                                  msg:
-                                                      'this service is not available at this time');
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (_) => QRScreen(
+                                                            image:
+                                                                _profileController
+                                                                    .data
+                                                                    .value
+                                                                    .avatar!,
+                                                          )));
                                             },
                                             icon: Image.asset(
                                                 'assets/images/scan.png'),
@@ -340,12 +410,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                           right: 24.w,
                                           left: 24.w,
                                           bottom: 3.h),
-                                      child: Text(
-                                        'I enjoy photography and take pictures of food, people, products, architecture, landscapes, and portraits.I like to find beauty in the world, capture it and share it to brighten people',
-                                        style: TextStyle(
-                                            fontSize: 13.sp,
-                                            color: Colors.white),
-                                      ),
+                                      child: _profileController
+                                                  .data.value.description !=
+                                              null
+                                          ? Text(
+                                              _profileController
+                                                  .data.value.description!,
+                                              style: TextStyle(
+                                                  fontSize: 13.sp,
+                                                  color: Colors.white),
+                                            )
+                                          : Text(
+                                              'No description',
+                                              style: TextStyle(
+                                                  fontSize: 13.sp,
+                                                  color: Colors.white),
+                                            ),
                                     ),
                                     Container(
                                       margin: EdgeInsets.all(10.w),
@@ -360,8 +440,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                         ),
                                         onPressed: () {
-                                          Navigator.pushNamed(
-                                              context, '/edit_profile_screen');
+                                          if (widget.isSelfPage) {
+                                            Navigator.pushNamed(context,
+                                                '/edit_profile_screen');
+                                          } else {
+                                            Fluttertoast.showToast(
+                                                msg: "Followed");
+                                          }
                                         },
                                         child: widget.isSelfPage
                                             ? Text(
@@ -372,11 +457,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                                     color: Colors.black),
                                               )
                                             : Text(
-                                                _dataController
-                                                        .postData
-                                                        .value[0]
-                                                        .user!
-                                                        .isFollow!
+                                                _profileController
+                                                        .data.value.isFollow!
                                                     ? 'Following'
                                                     : 'Follow',
                                                 style: TextStyle(
@@ -402,17 +484,31 @@ class _ProfilePageState extends State<ProfilePage> {
                                   unselectedLabelColor: Colors.grey,
                                   tabs: [
                                     Tab(
-                                        icon: Image.asset(
-                                            'assets/images/clips.png')),
+                                        icon: currentIndex == 0
+                                            ? Image.asset(
+                                                'assets/images/clips.png')
+                                            : Image.asset(
+                                                'assets/images/declips.png',
+                                              )),
                                     Tab(
-                                      icon:
-                                          Image.asset('assets/images/like.png'),
+                                      icon: currentIndex == 1
+                                          ? Image.asset(
+                                              'assets/images/like.png')
+                                          : Image.asset(
+                                              'assets/images/delike.png'),
                                     ),
                                     Tab(
-                                        icon: Image.asset(
-                                            'assets/images/gift.png')),
+                                        icon: currentIndex == 2
+                                            ? Image.asset(
+                                                'assets/images/gift.png')
+                                            : Image.asset(
+                                                'assets/images/gift.png',
+                                                color: Colors.grey,
+                                              )),
                                   ],
-                                  onTap: (index) {},
+                                  onTap: (index) {
+                                    onTap(index);
+                                  },
                                 ),
                                 Expanded(
                                   child: TabBarView(
@@ -429,10 +525,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   _profileController
                                                       .data.value.postsCount!),
                                               itemBuilder: (context, index) =>
-                                                  buildPostItem(
-                                                      _dataController.postData
-                                                          .value[index].path!,
-                                                      context),
+                                                  InkWell(
+                                                onTap: () {},
+                                                child: buildPostItem(
+                                                    _dataController.postData
+                                                        .value[index].path!,
+                                                    context),
+                                              ),
                                             )
                                           : const Center(
                                               child: Text('there is no posts')),
@@ -499,7 +598,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   );
                 },
-                assetPlaceHolder: 'asset/images/',
+                assetPlaceHolder: '',
               ),
             ),
           ),

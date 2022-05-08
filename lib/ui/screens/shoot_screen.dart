@@ -1,102 +1,113 @@
 import 'package:camera/camera.dart';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:stream_master/ui/widgets/shoot_bottom_widget.dart';
-import 'package:stream_master/ui/widgets/shoot_right_widget.dart';
-import 'package:stream_master/ui/widgets/shoot_top_widget.dart';
+import 'package:stream_master/helper/image_picker_helper.dart';
+import 'package:stream_master/ui/screens/main_widgets/app_loader.dart';
+import 'package:stream_master/ui/screens/video_screen.dart';
 
-///Shooting page
-class ShootPage extends StatefulWidget {
+class ShootingScreen extends StatefulWidget {
+  const ShootingScreen({Key? key}) : super(key: key);
+
   @override
-  State<StatefulWidget> createState() {
-    return _ShootPageState();
-  }
+  State<ShootingScreen> createState() => _ShootingScreenState();
 }
 
-class _ShootPageState extends State<ShootPage> {
-  CameraController? _cameraController;
-  List<CameraDescription>? _cameras;
+class _ShootingScreenState extends State<ShootingScreen> {
+  bool _isLoading = true;
+  late CameraController _cameraController;
+  bool _isRecording = false;
+  _initCamera() async {
+    final cameras = await availableCameras();
+    final front = cameras.firstWhere(
+        (camera) => camera.lensDirection == CameraLensDirection.back);
+    _cameraController = CameraController(front, ResolutionPreset.max);
+    await _cameraController.initialize();
+    setState(() => _isLoading = false);
+  }
+
+  _recordVideo() async {
+    if (_isRecording) {
+      final file = await _cameraController.stopVideoRecording();
+      setState(() => _isRecording = false);
+      final route = MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => VideoPage(filePath: file.path,isReview: true,),
+      );
+      Navigator.push(context, route);
+    } else {
+      await _cameraController.prepareForVideoRecording();
+      await _cameraController.startVideoRecording();
+      setState(() => _isRecording = true);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance!.addPostFrameCallback((_bottomBarLayout) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-      ));
-    });
-
     _initCamera();
-  }
-
-  Future<void> _initCamera() async {
-    _cameras = await availableCameras();
-    _cameraController = CameraController(
-      _cameras![0],
-      ResolutionPreset.max,
-      enableAudio: true,
-    );
-    _cameraController!.initialize().then((value) {
-      if (!mounted) return;
-      setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _cameraController!.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (null == _cameraController || !_cameraController!.value.isInitialized) {
-      return const Center(
-        child: SizedBox(
-          width: 50,
-          height: 50,
-          child: CircularProgressIndicator(
-            backgroundColor: Colors.red,
+    if (_isLoading) {
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/stack.png'),
           ),
+        ),
+        child: Center(
+          child: AppLoader(),
+        ),
+      );
+    } else {
+      return Center(
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: CameraPreview(_cameraController)),
+            Padding(
+              padding: const EdgeInsets.all(25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      ImagePickerHelper.openGallery(onGet: (file) {
+                        final route = MaterialPageRoute(
+                          fullscreenDialog: true,
+                          builder: (_) => VideoPage(filePath: file.path,isReview: true,),
+                        );
+                        Navigator.push(context, route);
+                      });
+                    },
+                    icon: const ImageIcon(
+                      AssetImage('assets/images/gallary.png'),
+                      size: 32,
+                    ),
+                  ),
+                  FloatingActionButton(
+                    backgroundColor: Colors.red,
+                    child: Icon(_isRecording ? Icons.stop : Icons.circle),
+                    onPressed: () => _recordVideo(),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const ImageIcon(
+                      AssetImage('assets/images/switch.png'),
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       );
     }
-
-    return Scaffold(
-      body: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width,
-          minWidth: MediaQuery.of(context).size.width,
-          maxHeight: MediaQuery.of(context).size.height,
-          minHeight: MediaQuery.of(context).size.height,
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            _getCameraPreview(),
-            // ShootTopWidget(),
-            // ShootRightWidget(),
-            Positioned(bottom: 0, child: ShootBottomWidget()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  //Get a preview of the camera
-  _getCameraPreview() {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    double cameraWidth = _cameraController!.value.previewSize!.width;
-    double cameraHeight = _cameraController!.value.previewSize!.height;
-    double scale = height / cameraHeight;
-    return Transform.scale(
-      scale: scale,
-      alignment: Alignment.topCenter,
-      child: CameraPreview(_cameraController!),
-    );
   }
 }
